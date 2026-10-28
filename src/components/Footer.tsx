@@ -6,9 +6,9 @@ export function Footer() {
     <footer className="border-t border-slate-800/80 mt-20 py-10 text-xs text-slate-500 relative z-10">
       <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <span>© {currentYear} <strong>domlog</strong>. Crafted by Dominic.</span>
+          <span>© {currentYear} <strong>domlog</strong>. Engineering Journal</span>
           <span className="text-slate-600">|</span>
-          <span className="font-mono text-amber-500/80 text-[11px]">code: waffle</span>
+          <span className="font-mono text-sky-400/80 text-[11px]">@initbtn</span>
         </div>
         <div className="flex items-center gap-4 text-slate-400">
           <a

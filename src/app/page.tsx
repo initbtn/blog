@@ -14,7 +14,7 @@ export default function HomePage() {
       {/* Hero Section: Persona Bento Card */}
       <section className="glass-panel rounded-3xl p-6 sm:p-10 relative overflow-hidden">
         {/* Glow backdrop */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-sky-500/10 via-amber-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-sky-500/15 via-amber-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10">
           <div className="space-y-4 max-w-xl">
@@ -23,21 +23,19 @@ export default function HomePage() {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="font-mono text-emerald-400 font-semibold">ONLINE</span>
               <span className="text-slate-500">|</span>
-              <span>Code: <strong className="text-amber-400 font-mono">waffle</strong></span>
-              <span className="text-slate-500">|</span>
-              <span className="font-mono text-slate-400">@initbtn</span>
+              <span className="font-mono text-sky-400 font-medium">@initbtn</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              시스템 엔지니어링 & <br />
+              개발 이야기 & <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300">
-                아키텍처 회고 저널
+                트러블슈팅 기록
               </span>
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300/90 leading-relaxed">
-              문제를 시스템으로 해결하는 견고한 아키텍처와 TDD를 지향합니다.
-              화려한 유행보다 단순함(Simplicity First)과 외과적 변경(Surgical Changes)을 신뢰합니다.
+              견고하고 신뢰할 수 있는 웹 시스템을 만듭니다.
+              새로운 기술을 탐색하고 복잡한 버그를 파고들어 단순하게 풀어내는 과정을 기록합니다.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -45,7 +43,7 @@ export default function HomePage() {
                 href="/about"
                 className="px-4 py-2 rounded-xl bg-sky-500 text-slate-950 text-xs sm:text-sm font-bold hover:bg-sky-400 transition-colors shadow-lg shadow-sky-500/20"
               >
-                엔지니어링 철학 보기 →
+                소개 보기 →
               </Link>
               <a
                 href="https://initbtn.github.io/resume-vuejs/"
@@ -58,10 +56,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Waffle Key Avatar Card */}
+          {/* Waffle Key Mascot Card */}
           <div className="shrink-0 mx-auto md:mx-0">
             <div className="relative group">
-              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500 to-amber-500 opacity-30 blur-md group-hover:opacity-60 transition duration-500" />
+              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500 to-amber-400 opacity-30 blur-md group-hover:opacity-60 transition duration-500" />
               <div className="relative w-44 h-44 sm:w-48 sm:h-48 rounded-2xl bg-slate-900 border-2 border-slate-700/80 p-3 flex flex-col items-center justify-between shadow-2xl">
                 <Image
                   src="/avatar.png"
@@ -72,7 +70,7 @@ export default function HomePage() {
                   priority
                 />
                 <div className="w-full text-center py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[10px] font-mono text-amber-400 font-bold">
-                  WAFFLE KEY (initbtn)
+                  WAFFLE & INITBTN
                 </div>
               </div>
             </div>
@@ -80,7 +78,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Bento Grid: Featured Essay & Quick Pillars */}
+      {/* Bento Grid: Featured Essay */}
       {featuredPost && (
         <section className="space-y-4">
           <div className="flex items-center justify-between pb-1">

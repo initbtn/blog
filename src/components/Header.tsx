@@ -10,22 +10,22 @@ export function Header() {
           href="/" 
           className="flex items-center gap-3 group"
         >
-          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-amber-500/40 shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform">
+          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-amber-500/40 shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform bg-slate-900 flex items-center justify-center">
             <Image 
               src="/avatar.png" 
-              alt="Waffle Key Avatar" 
+              alt="Avatar" 
               width={32} 
               height={32}
               className="object-cover"
               priority
             />
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="text-sm font-bold tracking-tight text-slate-100 group-hover:text-sky-400 transition-colors">
               domlog
             </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
-              waffle
+            <span className="text-[11px] font-mono text-slate-400">
+              @initbtn
             </span>
           </div>
         </Link>
@@ -36,7 +36,7 @@ export function Header() {
             아티클
           </Link>
           <Link href="/about" className="hover:text-slate-100 transition-colors">
-            엔지니어링 철학
+            소개
           </Link>
           <a 
             href="https://initbtn.github.io/resume-vuejs/" 

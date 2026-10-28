@@ -77,8 +77,8 @@ export default async function PostPage({ params }: PostPageProps) {
     },
     author: {
       '@type': 'Person',
-      name: '남성호 (Dominic)',
-      url: 'https://initbtn.github.io/resume-vuejs/',
+      name: 'initbtn',
+      url: 'https://github.com/initbtn',
     },
     publisher: {
       '@type': 'Organization',
@@ -158,7 +158,7 @@ export default async function PostPage({ params }: PostPageProps) {
           ← 아티클 목록 전체보기
         </Link>
         <div className="flex items-center gap-3">
-          <span>작성자: 남성호 (Dominic)</span>
+          <span>작성자: initbtn</span>
           <span>•</span>
           <a
             href="https://initbtn.github.io/resume-vuejs/"

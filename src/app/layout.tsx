@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     template: "%s | domlog",
   },
   description: "클라이언트 제로 트러스트 WAS 게이트웨이, 10Hz 해양 GIS 항법 엔진, sLM RAG 파이프라인 등 실전 문제 해결과 아키텍처 심층 분석 저널",
-  keywords: ["Software Engineering", "Next.js", "Architecture", "Zero Trust", "GIS", "RAG", "Vue.js", "AI Agent", "domlog", "waffle", "initbtn"],
-  authors: [{ name: "Dominic (initbtn)", url: "https://github.com/initbtn" }],
-  creator: "Dominic (waffle)",
+  keywords: ["Software Engineering", "Next.js", "Architecture", "Zero Trust", "GIS", "RAG", "Vue.js", "AI Agent", "domlog", "initbtn"],
+  authors: [{ name: "initbtn", url: "https://github.com/initbtn" }],
+  creator: "initbtn",
   alternates: {
     canonical: 'https://domlog.vercel.app',
   },
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
         url: 'https://domlog.vercel.app/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'domlog - Waffle Key (initbtn) Engineering Journal',
+        alt: 'domlog - initbtn Engineering Journal',
       },
     ],
   },
@@ -72,8 +72,8 @@ export default function RootLayout({
     description: '소프트웨어 엔지니어링 및 시스템 아키텍처 기술 블로그',
     author: {
       '@type': 'Person',
-      name: '남성호 (Dominic)',
-      url: 'https://initbtn.github.io/resume-vuejs/',
+      name: 'initbtn',
+      url: 'https://github.com/initbtn',
       sameAs: [
         'https://github.com/initbtn',
         'https://domlog.vercel.app',

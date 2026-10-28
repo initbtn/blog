@@ -3,8 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: '소개 & 엔지니어링 철학',
-  description: '도미닉(Dominic)의 엔지니어링 가치관, 아키텍처 철학, 그리고 코드네임 waffle의 유래',
+  title: '소개',
+  description: '웹 프론트엔드 & 풀스택 개발자 initbtn의 블로그 소개',
   alternates: {
     canonical: 'https://domlog.vercel.app/about',
   },
@@ -19,7 +19,7 @@ export default function AboutPage() {
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-slate-900 border border-slate-700/80 p-2 shrink-0 shadow-xl">
             <Image
               src="/avatar.png"
-              alt="Waffle Key Mascot"
+              alt="Mascot"
               width={112}
               height={112}
               className="rounded-xl object-contain"
@@ -28,57 +28,54 @@ export default function AboutPage() {
           </div>
           <div className="space-y-2 text-center sm:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 font-mono">
-              <span>Alias: <strong>Dominic</strong></span>
+              <span className="text-sky-400 font-semibold">@initbtn</span>
               <span>•</span>
-              <span className="text-amber-400">code: waffle</span>
-              <span>•</span>
-              <span className="text-sky-400">initbtn</span>
+              <span className="text-slate-400">Web & System Developer</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              소개 & 엔지니어링 철학
+              소개
             </h1>
             <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
-              복잡성을 숨기기보다 불필요한 계층을 걷어내며,
-              장애 발생 시 브라우저 번들부터 데이터베이스 커널까지 추적하여 문제를 해결합니다.
+              웹 프론트엔드와 풀스택을 다루며, 복잡한 시스템의 구조를 명확하게 정리하고
+              실무에서 마주친 트러블슈팅 경험을 공유하는 것을 좋아합니다.
             </p>
           </div>
         </div>
       </header>
 
-      {/* Main Philosophy Sections */}
+      {/* Main Story & Profile */}
       <section className="glass-panel rounded-2xl p-6 sm:p-10 space-y-8">
         <div className="space-y-3">
           <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-            <span className="text-amber-400">#</span> 코드네임 waffle 과 initbtn 의 유래
+            <span className="text-amber-400">#</span> Waffle 과 initbtn 이야기
           </h2>
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-            <strong>Waffle(와플)</strong>은 정돈된 격자(Grid) 구조처럼 안정적이고 규격화된 시스템 아키텍처를 상징하며, 
-            <strong>initbtn(초기화 버튼)</strong>은 문제가 꼬였을 때 미봉책으로 덮지 않고 시스템의 기저 상태(Clean State)로 명확히 환원할 수 있는 설계 능력을 의미합니다.
-            시스템을 언제든 신뢰 가능한 최초 상태로 초기화할 수 있는 안전장치를 만드는 것이 저의 핵심 엔지니어링 태도입니다.
+            블로그의 마스코트는 잘 구워진 바삭한 <strong>와플(Waffle)</strong>과 키보드의 <strong>초기화 버튼(initbtn)</strong>을 모티브로 삼았습니다.
+            와플처럼 규격이 잘 짜인 모듈식 시스템을 좋아하고, 문제가 생겼을 때는 복잡하게 덮기보다 <strong>초기화 버튼(initbtn)</strong>처럼 언제든 깨끗한 기본 상태로 돌아가 차근차근 문제를 풀어내자는 가치관을 담고 있습니다.
           </p>
         </div>
 
         <div className="space-y-3 border-t border-slate-800 pt-6">
           <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-            <span className="text-sky-400">#</span> 핵심 엔지니어링 3원칙
+            <span className="text-sky-400">#</span> 관심사와 개발 태도
           </h2>
           <div className="grid gap-4 sm:grid-cols-3 pt-2 text-xs sm:text-sm">
             <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <div className="font-bold text-sky-400">1. Zero Trust 격리</div>
+              <div className="font-bold text-sky-400">보안과 격리</div>
               <p className="text-slate-400 leading-relaxed text-xs">
-                클라이언트는 안전하지 않습니다. DB 인증 정보와 도메인은 브라우저에 단 1바이트도 남기지 않고 WAS 게이트웨이 뒤로 격리합니다.
+                클라이언트에 민감한 정보를 노출하지 않고, 백엔드 게이트웨이를 얇고 안전하게 배치하는 구조를 지향합니다.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <div className="font-bold text-amber-400">2. Simplicity & Surgical</div>
+              <div className="font-bold text-amber-400">단순함과 가독성</div>
               <p className="text-slate-400 leading-relaxed text-xs">
-                지레짐작 추상화나 불필요한 레이어를 지양합니다. 문제를 해결하는 가장 작고 외과적인(surgical) 최소 코드를 작성합니다.
+                지나친 과설계나 불필요한 레이어 대신, 동료 누구나 쉽게 읽고 유지보수할 수 있는 코드를 선호합니다.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <div className="font-bold text-emerald-400">3. Goal-Driven TDD</div>
+              <div className="font-bold text-emerald-400">실측과 테스트</div>
               <p className="text-slate-400 leading-relaxed text-xs">
-                실패하는 테스트를 먼저 세우고, 정량적 메트릭과 실측 지표를 통해서만 변경의 유효성을 단언합니다.
+                가정만으로 코드를 넘기지 않고, 명확한 테스트 케이스와 지표 측정을 통해 안정성을 검증합니다.
               </p>
             </div>
           </div>
