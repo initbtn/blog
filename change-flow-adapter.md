@@ -18,7 +18,7 @@
 | **PR(⑥)** | PR 본문에 검증 증거(테스트/빌드 결과) 첨부 | `closes #N` 연결 |
 | **merge 모델(⑧)** | **squash-only** | 단독 owner, 사람 머지 게이트 준수 (명시 승인 시에만) |
 | **cleanup(⑨)** | 로컬 및 원격 피처 브랜치 정리 | 머지 후 `main` 브랜치 동기화 |
-| **배포(⑩)** | Vercel 또는 GitHub Pages 배포 | `main` 머지 시 자동 빌드 배포 |
+| **배포(⑩)** | Vercel 프로덕션 배포 (`vercel deploy --prod`) | Production URL: `https://blog-alpha-topaz-15.vercel.app`<br>Scope: `jsconn`, Project: `blog` |
 | **warming** | pass / gpg-agent | 자격 증명 캐시 상태 점검 후 실행 |
 | **보안 규율** | 제로 트러스트 & 시크릿 격리 | 1. 클라이언트 번들에 데이터베이스 자격증명, 평문 API Key 노출 절대 금지<br>2. 원격 API 통신 필요 시 Serverless WAS 게이트웨이 경유 |
 | **스타일 규율** | Tailwind CSS v4 & Typography | 인라인 `style={{ ... }}` 금지. `@plugin "@tailwindcss/typography"` 활용한 `.prose` 마크다운 렌더링 |
