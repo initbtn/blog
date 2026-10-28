@@ -17,104 +17,116 @@ def get_font(path, size):
     except Exception:
         return ImageFont.load_default()
 
-def draw_waffle_initbtn_character(size=512):
+def draw_waffle_keycap_avatar(size=512):
     """
-    Simple, cute 'waffle + initbtn' keycap mascot:
-    - Rounded keyboard keycap base with warm honey/amber waffle grid
-    - No heavy butter (removed as requested)
-    - Big, sparkling, adorable expressive eyes
-    - Clear, clean cyan reset arrow symbol (⟲) in center
+    Technical Simplicity & Architectural Elegance:
+    - Isometric/Frontal Mechanical Keyboard Keycap (the 'initbtn' switch)
+    - Keycap top surface features a crisp 3x3 waffle grid matrix
+      representing low coupling & high cohesion (Clean Architecture)
+    - Center keycap recess has a sharp cyan LED reset arrow (⟲)
+    - Modern dark slate + warm amber biscuit tone + electric cyan accent
+    - Pure engineering simplicity (no overly cartoonish clutter)
     """
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
     pad = int(size * 0.08)
-    r = int(size * 0.24)
+    r = int(size * 0.22)
     
-    # 1. Outer Keycap Base (#0f172a slate body with glowing cyan border)
+    # 1. Outer Keycap Body (Deep Slate #0b1120 with chamfered edge)
     draw.rounded_rectangle(
         [pad, pad, size - pad, size - pad],
         radius=r,
         fill=(15, 23, 42, 255),
-        outline=(56, 189, 248, 240),
-        width=int(size * 0.024)
+        outline=(56, 189, 248, 230),
+        width=int(size * 0.022)
     )
     
-    # 2. Waffle Biscuit Face (#f59e0b warm golden amber)
-    inner_pad = int(size * 0.15)
-    inner_r = int(size * 0.18)
+    # 2. Keycap Bevel / Angled Slope (Upper highlight & bottom shadow)
+    slope_pad = int(size * 0.13)
+    slope_r = int(size * 0.17)
     draw.rounded_rectangle(
-        [inner_pad, inner_pad, size - inner_pad, size - inner_pad],
-        radius=inner_r,
+        [slope_pad, slope_pad, size - slope_pad, size - slope_pad],
+        radius=slope_r,
+        fill=(24, 33, 54, 255),
+        outline=(30, 41, 59, 255),
+        width=int(size * 0.012)
+    )
+    
+    # 3. Keycap Top Plate: Golden Waffle Biscuit Matrix (#f59e0b)
+    plate_pad = int(size * 0.18)
+    plate_r = int(size * 0.13)
+    draw.rounded_rectangle(
+        [plate_pad, plate_pad, size - plate_pad, size - plate_pad],
+        radius=plate_r,
         fill=(245, 158, 11, 255),
-        outline=(217, 119, 6, 255),
+        outline=(180, 83, 9, 255),
         width=int(size * 0.015)
     )
     
-    # 3. Simple Waffle Grid Pockets (subtle indented pockets on sides)
-    pocket_w = int(size * 0.09)
-    pocket_h = int(size * 0.09)
-    pocket_r = int(size * 0.02)
-    pockets = [
-        (inner_pad + int(size * 0.04), inner_pad + int(size * 0.04)),
-        (size - inner_pad - pocket_w - int(size * 0.04), inner_pad + int(size * 0.04)),
-        (inner_pad + int(size * 0.04), size - inner_pad - pocket_h - int(size * 0.04)),
-        (size - inner_pad - pocket_w - int(size * 0.04), size - inner_pad - pocket_h - int(size * 0.04)),
-    ]
-    for px, py in pockets:
-        draw.rounded_rectangle([px, py, px + pocket_w, py + pocket_h], radius=pocket_r, fill=(217, 119, 6, 255))
-        draw.rounded_rectangle([px + 2, py + 2, px + pocket_w - 2, py + pocket_h - 2], radius=pocket_r - 1, fill=(180, 83, 9, 255))
+    # 4. 3x3 Keyboard Matrix / Waffle Grid (Clean geometric pockets)
+    grid_start = plate_pad + int(size * 0.04)
+    grid_end = size - plate_pad - int(size * 0.04)
+    step = (grid_end - grid_start) / 3
+    hole_size = step * 0.76
+    pocket_r = int(size * 0.03)
     
     cx = size // 2
     cy = size // 2
     
-    # 4. Big, Adorable, Expressive Eyes (Clean anime/mascot style)
-    eye_offset_x = int(size * 0.16)
-    eye_y = cy + int(size * 0.02)
-    eye_w = int(size * 0.095)
-    eye_h = int(size * 0.13)
+    for row in range(3):
+        for col in range(3):
+            # Center slot is the Core Reset Switch
+            if row == 1 and col == 1:
+                continue
+                
+            x1 = grid_start + col * step + (step - hole_size) / 2
+            y1 = grid_start + row * step + (step - hole_size) / 2
+            x2 = x1 + hole_size
+            y2 = y1 + hole_size
+            
+            # Recessed mechanical key switch pocket (dark amber cavity)
+            draw.rounded_rectangle([x1, y1, x2, y2], radius=pocket_r, fill=(180, 83, 9, 255))
+            draw.rounded_rectangle([x1 + 3, y1 + 3, x2 - 2, y2 - 2], radius=pocket_r - 2, fill=(217, 119, 6, 255))
+            
+            # Subtle keycap grid dot
+            dot_cx = (x1 + x2) / 2
+            dot_cy = (y1 + y2) / 2
+            draw.ellipse([dot_cx - 4, dot_cy - 4, dot_cx + 4, dot_cy + 4], fill=(254, 240, 138, 200))
+            
+    # 5. Center Core: The 'initbtn' Key (Pure Technical Simplicity)
+    center_hole_size = step * 0.92
+    hx1 = cx - center_hole_size / 2
+    hy1 = cy - center_hole_size / 2
+    hx2 = cx + center_hole_size / 2
+    hy2 = cy + center_hole_size / 2
     
-    # Left Eye
-    left_x = cx - eye_offset_x
-    draw.ellipse([left_x - eye_w, eye_y - eye_h, left_x + eye_w, eye_y + eye_h], fill=(15, 23, 42, 255))
-    # Big sparkling catchlight
-    draw.ellipse([left_x - int(eye_w * 0.65), eye_y - int(eye_h * 0.7), left_x + int(eye_w * 0.25), eye_y - int(eye_h * 0.05)], fill=(255, 255, 255, 255))
-    # Lower gentle reflection
-    draw.ellipse([left_x + int(eye_w * 0.1), eye_y + int(eye_h * 0.25), left_x + int(eye_w * 0.55), eye_y + int(eye_h * 0.65)], fill=(255, 255, 255, 220))
+    # Deep slate central switch pocket
+    draw.rounded_rectangle(
+        [hx1, hy1, hx2, hy2],
+        radius=pocket_r + 3,
+        fill=(11, 15, 25, 255),
+        outline=(56, 189, 248, 255),
+        width=int(size * 0.016)
+    )
     
-    # Right Eye
-    right_x = cx + eye_offset_x
-    draw.ellipse([right_x - eye_w, eye_y - eye_h, right_x + eye_w, eye_y + eye_h], fill=(15, 23, 42, 255))
-    draw.ellipse([right_x - int(eye_w * 0.65), eye_y - int(eye_h * 0.7), right_x + int(eye_w * 0.25), eye_y - int(eye_h * 0.05)], fill=(255, 255, 255, 255))
-    draw.ellipse([right_x + int(eye_w * 0.1), eye_y + int(eye_h * 0.25), right_x + int(eye_w * 0.55), eye_y + int(eye_h * 0.65)], fill=(255, 255, 255, 220))
+    # Sharp Glowing Cyan Reset Loop (⟲)
+    arc_radius = int(center_hole_size * 0.32)
+    arc_box = [cx - arc_radius, cy - arc_radius, cx + arc_radius, cy + arc_radius]
+    draw.arc(arc_box, start=50, end=310, fill=(56, 189, 248, 255), width=int(size * 0.024))
     
-    # 5. Soft Rosy Cheeks
-    cheek_r = int(size * 0.045)
-    cheek_y = eye_y + int(size * 0.09)
-    draw.ellipse([left_x - int(eye_w * 1.05) - cheek_r, cheek_y - int(cheek_r * 0.5), left_x - int(eye_w * 1.05) + cheek_r, cheek_y + int(cheek_r * 0.5)], fill=(239, 68, 68, 90))
-    draw.ellipse([right_x + int(eye_w * 1.05) - cheek_r, cheek_y - int(cheek_r * 0.5), right_x + int(eye_w * 1.05) + cheek_r, cheek_y + int(cheek_r * 0.5)], fill=(239, 68, 68, 90))
-    
-    # 6. Center Top: Clean 'initbtn' Reset Symbol (⟲)
-    symbol_y = cy - int(size * 0.19)
-    arc_r = int(size * 0.07)
-    arc_box = [cx - arc_r, symbol_y - arc_r, cx + arc_r, symbol_y + arc_r]
-    # Dark badge pocket behind symbol
-    draw.rounded_rectangle([cx - arc_r - 6, symbol_y - arc_r - 6, cx + arc_r + 6, symbol_y + arc_r + 6], radius=int(size * 0.03), fill=(15, 23, 42, 220))
-    draw.arc(arc_box, start=45, end=315, fill=(56, 189, 248, 255), width=int(size * 0.022))
-    
-    arrow_size = int(size * 0.028)
-    arrow_tip_x = cx + int(arc_r * math.cos(math.radians(45)))
-    arrow_tip_y = symbol_y - int(arc_r * math.sin(math.radians(45)))
+    # Crisp Arrow Head
+    arrow_size = int(size * 0.032)
+    arrow_tip_x = cx + int(arc_radius * math.cos(math.radians(50)))
+    arrow_tip_y = cy - int(arc_radius * math.sin(math.radians(50)))
     draw.polygon([
         (arrow_tip_x, arrow_tip_y - arrow_size),
         (arrow_tip_x + arrow_size, arrow_tip_y + int(arrow_size * 0.6)),
         (arrow_tip_x - int(arrow_size * 0.4), arrow_tip_y + int(arrow_size * 0.3))
     ], fill=(56, 189, 248, 255))
     
-    # 7. Gentle, Friendly Smile
-    mouth_y = cy + int(size * 0.16)
-    mouth_w = int(size * 0.045)
-    draw.arc([cx - mouth_w, mouth_y - mouth_w, cx + mouth_w, mouth_y + mouth_w], start=15, end=165, fill=(15, 23, 42, 255), width=int(size * 0.015))
+    # Center subtle core pulse dot
+    draw.ellipse([cx - 5, cy - 5, cx + 5, cy + 5], fill=(56, 189, 248, 220))
 
     return img
 
@@ -163,27 +175,27 @@ def generate_og_image(avatar):
     draw.rectangle([(12, 12), (width - 12, height - 12)], outline=(56, 189, 248, 60), width=1)
     
     pill_font = get_font(FONT_BOLD, 15)
-    pill_text = "⚡ DOMLOG | TECH BLOG"
+    pill_text = "⚡ DOMLOG | TECH & ARCHITECTURE"
     pill_x, pill_y = 80, 75
-    draw.rounded_rectangle([pill_x, pill_y, pill_x + 230, pill_y + 36], radius=18, fill=(15, 23, 42, 220), outline=(56, 189, 248, 180), width=1)
+    draw.rounded_rectangle([pill_x, pill_y, pill_x + 300, pill_y + 36], radius=18, fill=(15, 23, 42, 220), outline=(56, 189, 248, 180), width=1)
     draw.text((pill_x + 22, pill_y + 9), pill_text, font=pill_font, fill=(56, 189, 248, 255))
     
     title_font = get_font(FONT_BOLD, 52)
     draw.text((80, 138), "domlog", font=title_font, fill=(248, 250, 252, 255))
     
     sub_title_font = get_font(FONT_BOLD, 28)
-    draw.text((80, 215), "개발 이야기 & 트러블슈팅 기록", font=sub_title_font, fill=(56, 189, 248, 255))
+    draw.text((80, 215), "소프트웨어 엔지니어링 & 시스템 아키텍처", font=sub_title_font, fill=(56, 189, 248, 255))
     
     desc_font = get_font(FONT_REGULAR, 21)
-    draw.text((80, 275), "WAS 게이트웨이 보안, GIS 데이터 처리, AI 어시스턴트 등", font=desc_font, fill=(203, 213, 225, 255))
-    draw.text((80, 312), "실무에서 부딪힌 문제와 해결 과정을 편안하게 정리합니다.", font=desc_font, fill=(148, 163, 184, 255))
+    draw.text((80, 275), "낮은 결합도와 높은 응집도를 갖춘 모듈식 객체지향 설계", font=desc_font, fill=(203, 213, 225, 255))
+    draw.text((80, 312), "WAS 게이트웨이 보안, 해양 GIS 10Hz, 실무 트러블슈팅의 기록", font=desc_font, fill=(148, 163, 184, 255))
     
     badges = [
-        ("WAS 보안", (244, 63, 94)),
+        ("Zero Trust WAS", (244, 63, 94)),
         ("해양 GIS 10Hz", (56, 189, 248)),
+        ("Waffle Keycap", (245, 158, 11)),
         ("Next.js 16", (255, 255, 255)),
         ("AI Agent", (168, 85, 247)),
-        ("waffle", (245, 158, 11)),
         ("initbtn", (56, 189, 248)),
     ]
     
@@ -215,10 +227,10 @@ def generate_og_image(avatar):
     draw.rounded_rectangle([card_x - 8, card_y - 8, card_x + target_size + 8, card_y + target_size + 8], radius=36, fill=(15, 23, 42, 220), outline=(56, 189, 248, 160), width=2)
     img.paste(prof_img, (card_x, card_y), prof_img)
     
-    v_box = [card_x + 60, card_y + target_size - 22, card_x + target_size - 60, card_y + target_size + 18]
+    v_box = [card_x + 40, card_y + target_size - 22, card_x + target_size - 40, card_y + target_size + 18]
     draw.rounded_rectangle(v_box, radius=12, fill=(15, 23, 42, 245), outline=(56, 189, 248, 220), width=2)
     v_font = get_font(FONT_BOLD, 15)
-    draw.text((v_box[0] + 16, v_box[1] + 9), "WAFFLE · INITBTN", font=v_font, fill=(56, 189, 248, 255))
+    draw.text((v_box[0] + 16, v_box[1] + 9), "WAFFLE KEY (initbtn)", font=v_font, fill=(56, 189, 248, 255))
     
     out_path = os.path.join(PUBLIC_DIR, "og-image.png")
     img.save(out_path, "PNG", optimize=True)
@@ -227,21 +239,19 @@ def generate_og_image(avatar):
 def generate_svg_favicon():
     svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <rect x="6" y="6" width="88" height="88" rx="22" fill="#0f172a" stroke="#38bdf8" stroke-width="4"/>
-  <rect x="18" y="18" width="64" height="64" rx="16" fill="#f59e0b"/>
-  <!-- Pockets -->
-  <rect x="23" y="23" width="12" height="12" rx="3" fill="#b45309"/>
-  <rect x="65" y="23" width="12" height="12" rx="3" fill="#b45309"/>
-  <rect x="23" y="65" width="12" height="12" rx="3" fill="#b45309"/>
-  <rect x="65" y="65" width="12" height="12" rx="3" fill="#b45309"/>
-  <!-- Big Eyes -->
-  <ellipse cx="37" cy="52" rx="7" ry="10" fill="#0f172a"/>
-  <ellipse cx="35" cy="48" rx="3" ry="4" fill="#ffffff"/>
-  <ellipse cx="63" cy="52" rx="7" ry="10" fill="#0f172a"/>
-  <ellipse cx="61" cy="48" rx="3" ry="4" fill="#ffffff"/>
-  <!-- Reset Key symbol (initbtn) -->
-  <circle cx="50" cy="30" r="10" fill="#0f172a"/>
-  <path d="M 50 24 A 6 6 0 1 1 45 27" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-  <polygon points="45,23 45,29 41,26" fill="#38bdf8"/>
+  <rect x="18" y="18" width="64" height="64" rx="14" fill="#f59e0b"/>
+  <!-- 3x3 Grid Matrix -->
+  <rect x="23" y="23" width="14" height="14" rx="3" fill="#b45309"/>
+  <rect x="43" y="23" width="14" height="14" rx="3" fill="#b45309"/>
+  <rect x="63" y="23" width="14" height="14" rx="3" fill="#b45309"/>
+  <rect x="23" y="43" width="14" height="14" rx="3" fill="#b45309"/>
+  <!-- Center initbtn key -->
+  <rect x="41" y="41" width="18" height="18" rx="4" fill="#0b0f19" stroke="#38bdf8" stroke-width="2"/>
+  <path d="M 50 44 A 4.5 4.5 0 1 1 46 47" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+  <rect x="63" y="43" width="14" height="14" rx="3" fill="#b45309"/>
+  <rect x="23" y="63" width="14" height="14" rx="3" fill="#b45309"/>
+  <rect x="43" y="63" width="14" height="14" rx="3" fill="#b45309"/>
+  <rect x="63" y="63" width="14" height="14" rx="3" fill="#b45309"/>
 </svg>"""
     svg_path = os.path.join(PUBLIC_DIR, "favicon.svg")
     with open(svg_path, "w", encoding="utf-8") as f:
@@ -249,7 +259,7 @@ def generate_svg_favicon():
     print(f"Generated {svg_path}")
 
 if __name__ == "__main__":
-    avatar = draw_waffle_initbtn_character(512)
+    avatar = draw_waffle_keycap_avatar(512)
     generate_icons(avatar)
     generate_og_image(avatar)
     generate_svg_favicon()
