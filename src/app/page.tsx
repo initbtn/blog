@@ -70,7 +70,7 @@ export default function HomePage() {
                   priority
                 />
                 <div className="w-full text-center py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[10px] font-mono text-sky-400 font-bold">
-                  INITBTN (⟲)
+                  WAFFLE 3×3
                 </div>
               </div>
             </div>
