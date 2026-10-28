@@ -15,20 +15,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://domlog.vercel.app'),
   title: {
-    default: "dominic.log | 소프트웨어 엔지니어링 & 시스템 아키텍처 아티클",
-    template: "%s | dominic.log",
+    default: "domlog | 소프트웨어 엔지니어링 & 시스템 아키텍처 저널",
+    template: "%s | domlog",
   },
-  description: "실전 시스템 엔지니어링, 보안 게이트웨이, 고빈도 데이터 파이프라인, AI RAG 아키텍처 심층 분석 및 기술 회고 기록",
-  keywords: ["Software Engineering", "Next.js", "Architecture", "Zero Trust", "GIS", "RAG", "Vue.js", "AI Agent"],
-  authors: [{ name: "Dominic" }],
-  creator: "Dominic",
+  description: "클라이언트 제로 트러스트 WAS 게이트웨이, 10Hz 해양 GIS 항법 엔진, sLM RAG 파이프라인 등 실전 문제 해결과 아키텍처 심층 분석 저널",
+  keywords: ["Software Engineering", "Next.js", "Architecture", "Zero Trust", "GIS", "RAG", "Vue.js", "AI Agent", "domlog", "waffle", "initbtn"],
+  authors: [{ name: "Dominic (initbtn)", url: "https://github.com/initbtn" }],
+  creator: "Dominic (waffle)",
+  alternates: {
+    canonical: 'https://domlog.vercel.app',
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
-    type: "website",
-    locale: "ko_KR",
-    title: "dominic.log | 소프트웨어 엔지니어링 기술 블로그",
-    description: "실전 시스템 엔지니어링, 보안 게이트웨이, GIS, AI RAG 아키텍처 심층 분석",
-    siteName: "dominic.log",
+    type: 'website',
+    locale: 'ko_KR',
+    url: 'https://domlog.vercel.app',
+    siteName: 'domlog',
+    title: 'domlog | 소프트웨어 엔지니어링 & 시스템 아키텍처 저널',
+    description: '클라이언트 제로 트러스트 WAS 게이트웨이, 10Hz 해양 GIS 엔진, sLM AI RAG 아키텍처 심층 분석',
+    images: [
+      {
+        url: 'https://domlog.vercel.app/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'domlog - Waffle Key (initbtn) Engineering Journal',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'domlog | 소프트웨어 엔지니어링 & 시스템 아키텍처 저널',
+    description: '클라이언트 제로 트러스트 WAS 게이트웨이, 10Hz 해양 GIS 엔진, sLM AI RAG 아키텍처 심층 분석',
+    images: ['https://domlog.vercel.app/og-image.png'],
+    creator: '@initbtn',
   },
 };
 
@@ -37,14 +64,39 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'domlog',
+    url: 'https://domlog.vercel.app',
+    description: '소프트웨어 엔지니어링 및 시스템 아키텍처 기술 블로그',
+    author: {
+      '@type': 'Person',
+      name: '남성호 (Dominic)',
+      url: 'https://initbtn.github.io/resume-vuejs/',
+      sameAs: [
+        'https://github.com/initbtn',
+        'https://domlog.vercel.app',
+      ],
+    },
+  };
+
   return (
     <html
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-[#090d16] text-slate-100 bg-grid-pattern relative">
+        {/* Top ambient radial light */}
+        <div className="absolute top-0 left-0 right-0 h-96 bg-radial-glow pointer-events-none" />
         <Header />
-        <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-10">
+        <main className="flex-1 max-w-4xl w-full mx-auto px-5 sm:px-6 py-10 relative z-10">
           {children}
         </main>
         <Footer />
