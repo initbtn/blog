@@ -107,12 +107,10 @@ def draw_waffle_keycap_avatar(size=512):
         width=int(size * 0.016)
     )
     
-    # Sharp Glowing Cyan Reset Loop (⟲)
     arc_radius = int(center_hole_size * 0.32)
     arc_box = [cx - arc_radius, cy - arc_radius, cx + arc_radius, cy + arc_radius]
     draw.arc(arc_box, start=50, end=310, fill=(56, 189, 248, 255), width=int(size * 0.024))
     
-    # Crisp Arrow Head
     arrow_size = int(size * 0.032)
     arrow_tip_x = cx + int(arc_radius * math.cos(math.radians(50)))
     arrow_tip_y = cy - int(arc_radius * math.sin(math.radians(50)))
@@ -127,18 +125,15 @@ def draw_waffle_keycap_avatar(size=512):
     return img
 
 def generate_icons(avatar):
-    # 1. Avatar (512x512)
     avatar_path = os.path.join(PUBLIC_DIR, "avatar.png")
     avatar.save(avatar_path, "PNG", optimize=True)
     print(f"Generated {avatar_path} (512x512)")
     
-    # 2. apple-touch-icon.png (180x180)
     apple_icon = avatar.resize((180, 180), Image.Resampling.LANCZOS)
     apple_path = os.path.join(PUBLIC_DIR, "apple-touch-icon.png")
     apple_icon.save(apple_path, "PNG", optimize=True)
     print(f"Generated {apple_path} (180x180)")
     
-    # 3. favicon.ico (multi-size 16, 32, 48) in BOTH public/ and src/app/
     ico_path = os.path.join(PUBLIC_DIR, "favicon.ico")
     avatar.save(ico_path, format="ICO", sizes=[(16, 16), (32, 32), (48, 48)])
     
@@ -148,9 +143,14 @@ def generate_icons(avatar):
 
 def generate_og_image(avatar):
     """
-    Generate OG Image optimized for KakaoTalk half/square crop AND Twitter/Slack 1200x630.
-    KakaoTalk half scrap crops the CENTER 630x630 or 800x400 area.
-    Therefore, all primary content (Avatar, Brand, Title) is strictly centered in the inner safe zone!
+    Minimalist Profile Card Thumbnail:
+    - Pure, elegant, distraction-free profile card layout.
+    - No walls of text or bullet points (cleared as requested).
+    - Features ONLY:
+        * Centered Waffle Keycap avatar (large & crisp)
+        * 'domlog' & '@initbtn'
+        * Title: 'Full-Stack & AI Systems Builder'
+    - 100% KakaoTalk Half/Square crop and wide 16:9 safe.
     """
     width = 1200
     height = 630
@@ -158,99 +158,72 @@ def generate_og_image(avatar):
     img = Image.new("RGBA", (width, height), (9, 13, 22, 255))
     draw = ImageDraw.Draw(img)
     
+    # Subtle dark background gradient
     for y in range(height):
         ratio = y / height
-        r = int(9 + (30 - 9) * ratio)
-        g = int(13 + (41 - 13) * ratio)
-        b = int(22 + (59 - 22) * ratio)
+        r = int(9 + (26 - 9) * ratio)
+        g = int(13 + (36 - 13) * ratio)
+        b = int(22 + (52 - 22) * ratio)
         draw.line([(0, y), (width, y)], fill=(r, g, b, 255))
         
+    # Ambient radial light around the center
+    cx = 600
+    cy = 315
     glow_canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     glow_draw = ImageDraw.Draw(glow_canvas)
-    glow_draw.ellipse([(cx := 600) - 350, (cy := 315) - 300, cx + 350, cy + 300], fill=(56, 189, 248, 30))
-    glow_draw.ellipse([cx - 200, cy - 150, cx + 200, cy + 150], fill=(245, 158, 11, 20))
+    glow_draw.ellipse([cx - 300, cy - 260, cx + 300, cy + 260], fill=(56, 189, 248, 30))
+    glow_draw.ellipse([cx - 150, cy - 120, cx + 150, cy + 120], fill=(245, 158, 11, 22))
     glow_canvas = glow_canvas.filter(ImageFilter.GaussianBlur(80))
     img = Image.alpha_composite(img, glow_canvas)
     draw = ImageDraw.Draw(img)
     
-    # Engineering Grid Lines
-    grid_color = (255, 255, 255, 12)
+    # Subtle grid lines
+    grid_color = (255, 255, 255, 10)
     for x in range(0, width, 60):
         draw.line([(x, 0), (x, height)], fill=grid_color, width=1)
     for y in range(0, height, 60):
         draw.line([(0, y), (width, y)], fill=grid_color, width=1)
         
-    # Outer Border
-    draw.rectangle([(12, 12), (width - 12, height - 12)], outline=(56, 189, 248, 60), width=1)
+    # Outer border
+    draw.rectangle([(16, 16), (width - 16, height - 16)], outline=(56, 189, 248, 50), width=1)
     
-    # ── CENTERED SAFE ZONE LAYOUT (KakaoTalk 630x630 Square-Safe) ──
-    # Kakao center 630x630 is x: [285, 915], y: [0, 630]
-    
-    # 1. Centered Mascot Keycap Card
-    avatar_size = 180
+    # ── Centered Pure Profile Card ──
+    # 1. Large Crisp Avatar
+    avatar_size = 230
     avatar_resized = avatar.resize((avatar_size, avatar_size), Image.Resampling.LANCZOS)
     avatar_x = cx - avatar_size // 2
-    avatar_y = 65
+    avatar_y = 110
     
     # Frame container behind avatar
     draw.rounded_rectangle(
-        [avatar_x - 6, avatar_y - 6, avatar_x + avatar_size + 6, avatar_y + avatar_size + 6],
-        radius=28,
+        [avatar_x - 8, avatar_y - 8, avatar_x + avatar_size + 8, avatar_y + avatar_size + 8],
+        radius=36,
         fill=(15, 23, 42, 230),
-        outline=(56, 189, 248, 180),
+        outline=(56, 189, 248, 190),
         width=2
     )
     img.paste(avatar_resized, (avatar_x, avatar_y), avatar_resized)
     
-    # 2. Category / Identity Pill (Centered)
-    pill_font = get_font(FONT_BOLD, 14)
-    pill_text = "⚡ DOMLOG | @initbtn"
-    pbbox = draw.textbbox((0, 0), pill_text, font=pill_font)
-    pw = (pbbox[2] - pbbox[0]) + 32
-    px = cx - pw // 2
-    py = avatar_y + avatar_size + 18
-    draw.rounded_rectangle([px, py, px + pw, py + 30], radius=15, fill=(15, 23, 42, 220), outline=(56, 189, 248, 160), width=1)
-    draw.text((px + 16, py + 6), pill_text, font=pill_font, fill=(56, 189, 248, 255))
-    
-    # 3. Main Brand Title (Centered)
-    title_font = get_font(FONT_BOLD, 46)
+    # 2. Main Title: domlog
+    title_font = get_font(FONT_BOLD, 54)
     title_text = "domlog"
     tbbox = draw.textbbox((0, 0), title_text, font=title_font)
     tw = tbbox[2] - tbbox[0]
-    draw.text((cx - tw // 2, py + 40), title_text, font=title_font, fill=(248, 250, 252, 255))
+    draw.text((cx - tw // 2, avatar_y + avatar_size + 30), title_text, font=title_font, fill=(248, 250, 252, 255))
     
-    # 4. Subtitle / Domain (Centered)
-    sub_font = get_font(FONT_BOLD, 22)
-    sub_text = "소프트웨어 엔지니어링 & 시스템 아키텍처"
-    sbbox = draw.textbbox((0, 0), sub_text, font=sub_font)
-    sw = sbbox[2] - sbbox[0]
-    draw.text((cx - sw // 2, py + 98), sub_text, font=sub_font, fill=(56, 189, 248, 255))
+    # 3. Modern Role Headline: Full-Stack & AI Systems Builder
+    role_font = get_font(FONT_BOLD, 26)
+    role_text = "Full-Stack & AI Systems Builder"
+    rbbox = draw.textbbox((0, 0), role_text, font=role_font)
+    rw = rbbox[2] - rbbox[0]
+    draw.text((cx - rw // 2, avatar_y + avatar_size + 98), role_text, font=role_font, fill=(56, 189, 248, 255))
     
-    # 5. Core Value Statement (Centered)
-    desc_font = get_font(FONT_REGULAR, 18)
-    desc_text = "낮은 결합도와 높은 응집도를 갖춘 모듈식 객체지향 설계"
-    dbbox = draw.textbbox((0, 0), desc_text, font=desc_font)
-    dw = dbbox[2] - dbbox[0]
-    draw.text((cx - dw // 2, py + 134), desc_text, font=desc_font, fill=(203, 213, 225, 255))
-    
-    # 6. Bottom Domain (Centered)
-    url_font = get_font(FONT_REGULAR, 16)
-    url_text = "🔗 https://domlog.vercel.app"
-    ubbox = draw.textbbox((0, 0), url_text, font=url_font)
-    uw = ubbox[2] - ubbox[0]
-    draw.text((cx - uw // 2, py + 176), url_text, font=url_font, fill=(148, 163, 184, 255))
-    
-    # Left & Right Wing Accents (Visible in Full 16:9 on Desktop/Twitter, safely cropped in Kakao)
-    left_badge_y = 260
-    draw.rounded_rectangle([60, left_badge_y, 240, left_badge_y + 80], radius=12, fill=(15, 23, 42, 200), outline=(51, 65, 85, 200), width=1)
-    b_font = get_font(FONT_BOLD, 14)
-    draw.text((80, left_badge_y + 16), "ARCHITECTURE", font=b_font, fill=(245, 158, 11, 255))
-    draw.text((80, left_badge_y + 44), "Waffle Grid 3x3", font=desc_font, fill=(203, 213, 225, 255))
-    
-    right_badge_y = 260
-    draw.rounded_rectangle([width - 240, right_badge_y, width - 60, right_badge_y + 80], radius=12, fill=(15, 23, 42, 200), outline=(51, 65, 85, 200), width=1)
-    draw.text((width - 220, right_badge_y + 16), "ZERO TRUST", font=b_font, fill=(56, 189, 248, 255))
-    draw.text((width - 220, right_badge_y + 44), "initbtn Reset", font=desc_font, fill=(203, 213, 225, 255))
+    # 4. Identity Tag: @initbtn
+    tag_font = get_font(FONT_REGULAR, 20)
+    tag_text = "@initbtn"
+    gbbox = draw.textbbox((0, 0), tag_text, font=tag_font)
+    gw = gbbox[2] - gbbox[0]
+    draw.text((cx - gw // 2, avatar_y + avatar_size + 138), tag_text, font=tag_font, fill=(148, 163, 184, 255))
 
     out_path = os.path.join(PUBLIC_DIR, "og-image.png")
     img.save(out_path, "PNG", optimize=True)

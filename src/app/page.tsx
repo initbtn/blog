@@ -27,15 +27,15 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              개발 이야기 & <br />
+              Full-Stack & <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300">
-                트러블슈팅 기록
+                AI Systems Builder
               </span>
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300/90 leading-relaxed">
-              견고하고 신뢰할 수 있는 웹 시스템을 만듭니다.
-              새로운 기술을 탐색하고 복잡한 버그를 파고들어 단순하게 풀어내는 과정을 기록합니다.
+              견고한 웹 풀스택 시스템부터 10Hz 실시간 데이터 파이프라인, AI RAG 에이전트까지.
+              문제를 시스템으로 해결하는 과정과 트러블슈팅을 기록합니다.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -56,21 +56,21 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Waffle Key Mascot Card */}
+          {/* Waffle Keycap Mascot Card */}
           <div className="shrink-0 mx-auto md:mx-0">
             <div className="relative group">
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500 to-amber-400 opacity-30 blur-md group-hover:opacity-60 transition duration-500" />
               <div className="relative w-44 h-44 sm:w-48 sm:h-48 rounded-2xl bg-slate-900 border-2 border-slate-700/80 p-3 flex flex-col items-center justify-between shadow-2xl">
                 <Image
                   src="/avatar.png"
-                  alt="Waffle Key Mascot"
+                  alt="Waffle Keycap Mascot"
                   width={140}
                   height={140}
                   className="rounded-xl object-contain drop-shadow-md group-hover:scale-105 transition-transform"
                   priority
                 />
-                <div className="w-full text-center py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[10px] font-mono text-amber-400 font-bold">
-                  WAFFLE & INITBTN
+                <div className="w-full text-center py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[10px] font-mono text-sky-400 font-bold">
+                  INITBTN (⟲)
                 </div>
               </div>
             </div>
