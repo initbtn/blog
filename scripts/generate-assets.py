@@ -117,104 +117,79 @@ def generate_icons(avatar):
 
 def generate_og_image(avatar):
     """
-    Requested Layout:
-    - Left: Large, crisp Waffle Keycap Profile Avatar
-    - Right: Clean, elegant Typography (Brand, Title, Tagline, Domain)
-    - Background: Subtle engineering grid pattern with ambient cyan/amber glow
-    - 1200x630 standard card
+    Requested Layout (Referencing busan-youth-day high readability & Safe Zone standard):
+    - Background: Clean, Solid Deep Modern Dark (#0a0f1d) with zero grid pattern noise
+    - Safe Zone: 100% of vital content safely contained within (x: 100~1100, y: 50~580)
+      to prevent ANY cropping in KakaoTalk 2:1 mobile link card preview
+    - Left: Sharp 3x3 Waffle Matrix Keycap (320px)
+    - Right: High-contrast, clean typography (domlog, Full-Stack & AI Systems Builder, description, URL)
     """
     width = 1200
     height = 630
     
-    img = Image.new("RGBA", (width, height), (9, 13, 22, 255))
+    # 1. Clean Deep Modern Slate/Navy solid background (Zero Grid Lines)
+    img = Image.new("RGBA", (width, height), (10, 15, 29, 255))
     draw = ImageDraw.Draw(img)
     
-    # Subtle dark background gradient
-    for y in range(height):
-        ratio = y / height
-        r = int(9 + (26 - 9) * ratio)
-        g = int(13 + (36 - 13) * ratio)
-        b = int(22 + (52 - 22) * ratio)
-        draw.line([(0, y), (width, y)], fill=(r, g, b, 255))
-        
-    # Ambient radial light: amber glow near avatar on left, sky glow on right
+    # Subtle elegant ambient accent glow (soft gradient)
     glow_canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     glow_draw = ImageDraw.Draw(glow_canvas)
-    glow_draw.ellipse([(80, 80), (580, 550)], fill=(245, 158, 11, 20))
-    glow_draw.ellipse([(700, 80), (1200, 580)], fill=(56, 189, 248, 18))
-    glow_canvas = glow_canvas.filter(ImageFilter.GaussianBlur(90))
+    glow_draw.ellipse([(100, 100), (550, 530)], fill=(245, 158, 11, 24))
+    glow_draw.ellipse([(650, 80), (1150, 550)], fill=(56, 189, 248, 22))
+    glow_canvas = glow_canvas.filter(ImageFilter.GaussianBlur(80))
     img = Image.alpha_composite(img, glow_canvas)
     draw = ImageDraw.Draw(img)
     
-    # Engineering Grid Lines (40px) - very subtle to keep text crystal-clear
-    grid_color = (255, 255, 255, 6)
-    for x in range(0, width, 50):
-        draw.line([(x, 0), (x, height)], fill=grid_color, width=1)
-    for y in range(0, height, 50):
-        draw.line([(0, y), (width, y)], fill=grid_color, width=1)
-        
-    # Outer Border
-    draw.rectangle([(16, 16), (width - 16, height - 16)], outline=(56, 189, 248, 40), width=1)
+    # Subtle outer safe border
+    draw.rounded_rectangle([(32, 32), (width - 32, height - 32)], radius=24, outline=(30, 41, 59, 255), width=2)
     
-    # ── LEFT: Large Waffle Keycap Avatar ──
-    avatar_size = 400
+    # ── LEFT: Waffle Keycap Avatar (Sized & Centered within Safe Zone) ──
+    # Kakao safe area: y from 40 to 590 (height 550), x from 90 to 1110
+    avatar_size = 320
     avatar_resized = avatar.resize((avatar_size, avatar_size), Image.Resampling.LANCZOS)
-    avatar_x = 90
+    avatar_x = 110
     avatar_y = (height - avatar_size) // 2
     
-    # Elevated Frame Container behind avatar
+    # Backdrop frame for the avatar
     draw.rounded_rectangle(
-        [avatar_x - 10, avatar_y - 10, avatar_x + avatar_size + 10, avatar_y + avatar_size + 10],
-        radius=44,
-        fill=(13, 20, 36, 245),
-        outline=(56, 189, 248, 160),
+        [avatar_x - 8, avatar_y - 8, avatar_x + avatar_size + 8, avatar_y + avatar_size + 8],
+        radius=36,
+        fill=(15, 23, 42, 255),
+        outline=(56, 189, 248, 180),
         width=2
     )
     img.paste(avatar_resized, (avatar_x, avatar_y), avatar_resized)
     
-    # ── RIGHT: Clean Typography & Role Statement (High Contrast Slate-900 Glass Card) ──
-    card_x = 540
-    card_y = 110
-    card_w = 600
-    card_h = 410
-    # Text card backdrop panel for maximum contrast against grid
-    draw.rounded_rectangle(
-        [card_x, card_y, card_x + card_w, card_y + card_h],
-        radius=28,
-        fill=(13, 20, 36, 235),
-        outline=(56, 189, 248, 90),
-        width=1
-    )
-    
-    text_x = card_x + 36
-    content_y = card_y + 36
+    # ── RIGHT: Clean High-Contrast Typography ──
+    text_x = 490
+    content_y = 135
     
     # 1. Category Pill
     pill_font = get_font(FONT_BOLD, 14)
     pill_text = "TECH & ARCHITECTURE JOURNAL"
     pbbox = draw.textbbox((0, 0), pill_text, font=pill_font)
-    pw = (pbbox[2] - pbbox[0]) + 28
-    draw.rounded_rectangle([text_x, content_y, text_x + pw, content_y + 30], radius=15, fill=(15, 23, 42, 255), outline=(56, 189, 248, 200), width=1)
-    draw.text((text_x + 14, content_y + 6), pill_text, font=pill_font, fill=(56, 189, 248, 255))
+    pw = (pbbox[2] - pbbox[0]) + 26
+    draw.rounded_rectangle([text_x, content_y, text_x + pw, content_y + 30], radius=15, fill=(15, 23, 42, 255), outline=(56, 189, 248, 180), width=1)
+    draw.text((text_x + 13, content_y + 6), pill_text, font=pill_font, fill=(56, 189, 248, 255))
     
     # 2. Main Brand Name: domlog
-    brand_font = get_font(FONT_BOLD, 66)
-    draw.text((text_x, content_y + 46), "domlog", font=brand_font, fill=(255, 255, 255, 255))
+    brand_font = get_font(FONT_BOLD, 68)
+    draw.text((text_x, content_y + 48), "domlog", font=brand_font, fill=(255, 255, 255, 255))
     
     # 3. Modern Role Headline: Full-Stack & AI Systems Builder
-    role_font = get_font(FONT_BOLD, 30)
-    draw.text((text_x, content_y + 138), "Full-Stack & AI Systems Builder", font=role_font, fill=(56, 189, 248, 255))
+    role_font = get_font(FONT_BOLD, 28)
+    draw.text((text_x, content_y + 142), "Full-Stack & AI Systems Builder", font=role_font, fill=(56, 189, 248, 255))
     
-    # 4. Value Statement / Description
+    # 4. Value Statement / Description (Crisp White / Silver)
     desc_font = get_font(FONT_BOLD, 20)
-    draw.text((text_x, content_y + 192), "낮은 결합도와 높은 응집도를 갖춘 모듈식 아키텍처", font=desc_font, fill=(241, 245, 249, 255))
+    draw.text((text_x, content_y + 196), "낮은 결합도와 높은 응집도를 갖춘 모듈식 아키텍처", font=desc_font, fill=(241, 245, 249, 255))
     
     desc_sub_font = get_font(FONT_REGULAR, 19)
-    draw.text((text_x, content_y + 228), "실무 시스템 엔지니어링과 트러블슈팅의 기록", font=desc_sub_font, fill=(186, 200, 222, 255))
+    draw.text((text_x, content_y + 234), "실무 시스템 엔지니어링과 트러블슈팅의 기록", font=desc_sub_font, fill=(186, 200, 222, 255))
     
     # 5. Domain / Link Footer
     url_font = get_font(FONT_BOLD, 18)
-    draw.text((text_x, content_y + 288), "https://domlog.vercel.app", font=url_font, fill=(56, 189, 248, 255))
+    draw.text((text_x, content_y + 296), "https://domlog.vercel.app", font=url_font, fill=(56, 189, 248, 255))
 
     out_path = os.path.join(PUBLIC_DIR, "og-image.png")
     img.save(out_path, "PNG", optimize=True)
