@@ -34,18 +34,19 @@ export async function POST(req: NextRequest) {
     const senderName = escapeHtml((name && String(name).trim()) || '방문자');
     const senderContact = escapeHtml((contact && String(contact).trim()) || '미제공');
     const senderMessage = escapeHtml(String(message).trim());
-    const sessionTag = escapeHtml((sessionId && String(sessionId).slice(0, 8)) || 'direct');
+    const cleanSessionId = (sessionId && String(sessionId).trim()) || Math.random().toString(36).substring(2, 10);
+    const sessionTag = escapeHtml(cleanSessionId);
     const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
     let telegramText = `💬 <b>[domlog] 블로그 웹 실시간 문의</b>\n`;
     telegramText += `━━━━━━━━━━━━━━━━━━━━\n`;
     telegramText += `• <b>발신자</b>: ${senderName}\n`;
     telegramText += `• <b>연락처/회신처</b>: ${senderContact}\n`;
-    telegramText += `• <b>세션 ID</b>: #${sessionTag}\n`;
+    telegramText += `• <b>세션 ID</b>: #sess-${sessionTag}\n`;
     telegramText += `• <b>접수 시각</b>: ${now}\n`;
     telegramText += `• <b>문의 내용</b>:\n${senderMessage}\n`;
     telegramText += `━━━━━━━━━━━━━━━━━━━━\n`;
-    telegramText += `<i>Tip: 작성자에게 회신 연락처로 메시지를 남겨주세요.</i>`;
+    telegramText += `<i>Tip: 이 메시지에 <b>'답장(Reply)'</b>을 보내시면 독자의 채팅창에 실시간으로 전송됩니다! (/typing 입력 시 ... 애니메이션 표시)</i>`;
 
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
