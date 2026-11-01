@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllSessions, addAdminMessage, setAdminTyping } from '@/lib/chatStore';
+import { getAllSessions, syncSessionsFromFirestore, addAdminMessage, setAdminTyping } from '@/lib/chatStore';
 
 export async function GET() {
-  const sessions = getAllSessions();
+  // 인메모리 세션이 비어있는 경우(서버리스 콜드 스타트 등) Firestore에서 비동기 복원
+  let sessions = getAllSessions();
+  if (sessions.length === 0) {
+    sessions = await syncSessionsFromFirestore();
+  }
+
   return NextResponse.json({
     success: true,
     sessions,
@@ -18,13 +23,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'sessionId가 필요합니다.' }, { status: 400 });
     }
 
-    // 1. 상담사 실시간 키 입력 타이핑 이벤트
+    // 1. 상담사 실시간 키 입력 타이핑 이벤트 (순수 RAM)
     if (action === 'typing') {
       setAdminTyping(sessionId, Boolean(isTyping));
       return NextResponse.json({ success: true, typing: isTyping });
     }
 
-    // 2. 답변 전송 이벤트
+    // 2. 답변 전송 이벤트 (RAM + 비동기 Firestore)
     if (action === 'send') {
       if (!text || typeof text !== 'string' || !text.trim()) {
         return NextResponse.json({ success: false, error: '답변 내용을 입력해주세요.' }, { status: 400 });
