@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addRelayMessage, setSessionStatus } from '@/lib/chatStore';
+import { addAdminMessage, setAdminTyping } from '@/lib/chatStore';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,12 +26,12 @@ export async function POST(req: NextRequest) {
 
         // 명령어 형태 지원: /typing -> 타이핑 중 상태 표시
         if (text.trim() === '/typing' || text.trim() === '...') {
-          setSessionStatus(sessionId, 'typing');
+          setAdminTyping(sessionId, true);
           return NextResponse.json({ ok: true, status: 'typing set' });
         }
 
         // 일반 답장 텍스트인 경우 세션에 관리자 메시지 추가
-        addRelayMessage(sessionId, 'admin', text.trim());
+        addAdminMessage(sessionId, text.trim());
         return NextResponse.json({ ok: true, deliveredTo: sessionId });
       }
     }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { registerUserMessage } from '@/lib/chatStore';
 
 function escapeHtml(str: string): string {
   return str
@@ -19,6 +20,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const senderName = escapeHtml((name && String(name).trim()) || '방문자');
+    const senderContact = escapeHtml((contact && String(contact).trim()) || '미제공');
+    const senderMessage = escapeHtml(String(message).trim());
+    const cleanSessionId = (sessionId && String(sessionId).trim()) || Math.random().toString(36).substring(2, 10);
+    const sessionTag = escapeHtml(cleanSessionId);
+    const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+    // 1. In-Memory ChatStore 세션에 등록 (관리자 앱에서 실시간 감지 가능)
+    registerUserMessage(cleanSessionId, senderMessage, senderName, senderContact);
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -31,13 +42,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const senderName = escapeHtml((name && String(name).trim()) || '방문자');
-    const senderContact = escapeHtml((contact && String(contact).trim()) || '미제공');
-    const senderMessage = escapeHtml(String(message).trim());
-    const cleanSessionId = (sessionId && String(sessionId).trim()) || Math.random().toString(36).substring(2, 10);
-    const sessionTag = escapeHtml(cleanSessionId);
-    const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-
     let telegramText = `💬 <b>[domlog] 블로그 웹 실시간 문의</b>\n`;
     telegramText += `━━━━━━━━━━━━━━━━━━━━\n`;
     telegramText += `• <b>발신자</b>: ${senderName}\n`;
@@ -46,7 +50,7 @@ export async function POST(req: NextRequest) {
     telegramText += `• <b>접수 시각</b>: ${now}\n`;
     telegramText += `• <b>문의 내용</b>:\n${senderMessage}\n`;
     telegramText += `━━━━━━━━━━━━━━━━━━━━\n`;
-    telegramText += `<i>Tip: 이 메시지에 <b>'답장(Reply)'</b>을 보내시면 독자의 채팅창에 실시간으로 전송됩니다! (/typing 입력 시 ... 애니메이션 표시)</i>`;
+    telegramText += `<i>Tip: 관리자 웹 앱(/admin/chat) 또는 텔레그램 답장(Reply)으로 실시간 응답할 수 있습니다.</i>`;
 
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
@@ -63,10 +67,6 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errDetail = await response.text();
       console.error('Telegram Webhook delivery failed:', errDetail);
-      return NextResponse.json(
-        { success: false, error: '텔레그램 웹훅 전송 실패' },
-        { status: 502 }
-      );
     }
 
     return NextResponse.json({
