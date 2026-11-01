@@ -2,8 +2,9 @@
 /**
  * In-Memory & Serverless Safe Session Chat Relay Store
  * 
- * 텔레그램 관리자의 Reply 웹훅을 수신하여 해당 sessionId에 메시지를 적재하고,
- * 프론트엔드가 이를 폴링/가져갈 수 있도록 보관합니다.
+ * - 실시간 세션 목록 관리
+ * - 상담사 키 입력 이벤트 기반 실시간 typing 감지
+ * - 독자-관리자 양방향 릴레이
  */
 
 export interface RelayMessage {
@@ -15,76 +16,147 @@ export interface RelayMessage {
   timeString: string;
 }
 
-interface SessionState {
+export interface SessionInfo {
+  sessionId: string;
+  senderName: string;
+  contact: string;
+  createdAt: number;
+  lastActiveAt: number;
   status: 'idle' | 'seen' | 'typing';
-  lastSeenTime?: number;
+  lastTypingAt?: number;
+  unreadAdminCount: number;
   messages: RelayMessage[];
 }
 
-// Global cache for warm serverless instances
 declare global {
-  var __blogChatStore: Map<string, SessionState> | undefined;
+  var __blogChatStore: Map<string, SessionInfo> | undefined;
 }
 
-const store: Map<string, SessionState> = global.__blogChatStore || new Map();
+const store: Map<string, SessionInfo> = global.__blogChatStore || new Map();
 if (process.env.NODE_ENV !== 'production') {
   global.__blogChatStore = store;
 }
 
-export function getSessionState(sessionId: string): SessionState {
+export function registerUserMessage(
+  sessionId: string,
+  text: string,
+  senderName: string = '방문자',
+  contact: string = '미제공'
+): RelayMessage {
   const cleanId = sessionId.trim();
+  const now = Date.now();
+  const timeString = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
   if (!store.has(cleanId)) {
     store.set(cleanId, {
+      sessionId: cleanId,
+      senderName,
+      contact,
+      createdAt: now,
+      lastActiveAt: now,
       status: 'idle',
+      unreadAdminCount: 0,
       messages: [],
     });
   }
-  return store.get(cleanId)!;
-}
 
-export function setSessionStatus(sessionId: string, status: 'idle' | 'seen' | 'typing') {
-  const state = getSessionState(sessionId);
-  state.status = status;
-  if (status === 'seen' || status === 'typing') {
-    state.lastSeenTime = Date.now();
-  }
-}
-
-export function addRelayMessage(sessionId: string, sender: 'admin' | 'user', text: string): RelayMessage {
-  const state = getSessionState(sessionId);
-  const now = new Date();
-  const timeString = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+  const session = store.get(cleanId)!;
+  session.senderName = senderName || session.senderName;
+  session.contact = contact || session.contact;
+  session.lastActiveAt = now;
+  session.unreadAdminCount += 1;
 
   const msg: RelayMessage = {
-    id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-    sessionId,
-    sender,
+    id: `msg-${now}-${Math.random().toString(36).substring(2, 6)}`,
+    sessionId: cleanId,
+    sender: 'user',
     text,
-    timestamp: Date.now(),
+    timestamp: now,
     timeString,
   };
 
-  state.messages.push(msg);
-  // 관리자가 답장을 보내면 typing 상태 해제
-  if (sender === 'admin') {
-    state.status = 'idle';
-  }
+  session.messages.push(msg);
   return msg;
 }
 
+export function addAdminMessage(sessionId: string, text: string): RelayMessage {
+  const cleanId = sessionId.trim();
+  const now = Date.now();
+  const timeString = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+  if (!store.has(cleanId)) {
+    store.set(cleanId, {
+      sessionId: cleanId,
+      senderName: '방문자',
+      contact: '미제공',
+      createdAt: now,
+      lastActiveAt: now,
+      status: 'idle',
+      unreadAdminCount: 0,
+      messages: [],
+    });
+  }
+
+  const session = store.get(cleanId)!;
+  session.lastActiveAt = now;
+  session.status = 'idle'; // 답변 전송 완료 시 typing 해제
+  session.lastTypingAt = undefined;
+
+  const msg: RelayMessage = {
+    id: `msg-${now}-${Math.random().toString(36).substring(2, 6)}`,
+    sessionId: cleanId,
+    sender: 'admin',
+    text,
+    timestamp: now,
+    timeString,
+  };
+
+  session.messages.push(msg);
+  return msg;
+}
+
+/**
+ * 상담사가 클라이언트 앱에서 답변을 입력 중일 때 호출
+ */
+export function setAdminTyping(sessionId: string, isTyping: boolean) {
+  const cleanId = sessionId.trim();
+  if (store.has(cleanId)) {
+    const session = store.get(cleanId)!;
+    session.status = isTyping ? 'typing' : 'idle';
+    session.lastTypingAt = isTyping ? Date.now() : undefined;
+  }
+}
+
+/**
+ * 모든 세션 목록 조회 (관리자 대시보드용)
+ */
+export function getAllSessions(): SessionInfo[] {
+  const sessions = Array.from(store.values());
+  return sessions.sort((a, b) => b.lastActiveAt - a.lastActiveAt);
+}
+
+/**
+ * 특정 세션의 메시지 및 상태 조회 (독자 polling용)
+ */
 export function getMessagesSince(sessionId: string, sinceTimestamp: number = 0): {
   messages: RelayMessage[];
   status: 'idle' | 'seen' | 'typing';
 } {
-  const state = getSessionState(sessionId);
-  // Auto-expire 'typing' status after 12 seconds if no reply sent
-  if (state.status === 'typing' && state.lastSeenTime && Date.now() - state.lastSeenTime > 12000) {
-    state.status = 'idle';
+  const cleanId = sessionId.trim();
+  if (!store.has(cleanId)) {
+    return { messages: [], status: 'idle' };
   }
 
-  const newMsgs = state.messages.filter((m) => m.timestamp > sinceTimestamp);
+  const session = store.get(cleanId)!;
+
+  // 상담사가 입력을 멈춘 지 6초가 지나면 자동으로 typing 상태 해제
+  if (session.status === 'typing' && session.lastTypingAt && Date.now() - session.lastTypingAt > 6000) {
+    session.status = 'idle';
+  }
+
+  const newMsgs = session.messages.filter((m) => m.timestamp > sinceTimestamp);
   return {
     messages: newMsgs,
-    status: state.status,
+    status: session.status,
   };
 }
