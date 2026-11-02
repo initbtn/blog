@@ -6,6 +6,7 @@ import {
   getAllSessions,
   getMessagesSince,
   syncSessionsFromGateway,
+  getSessionByTopicId,
 } from '../src/lib/chatStore';
 
 const URL_BASE = 'https://gw.example.test';
@@ -228,5 +229,45 @@ describe('Hybrid In-Memory + Assist Gateway Chat Relay Store', () => {
 
     expect(Array.isArray(sessions)).toBe(true);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('텔레그램 토픽 ↔ 세션 매핑', () => {
+  beforeEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('토픽 ID 와 함께 등록한 세션을 토픽 ID 로 찾을 수 있다', () => {
+    registerUserMessage('topic-sess-1', '문의', '이름', '연락처', 6);
+
+    expect(getSessionByTopicId(6)?.sessionId).toBe('topic-sess-1');
+    expect(getSessionByTopicId(6)?.telegramTopicId).toBe(6);
+  });
+
+  it('이후 토픽 ID 없이 등록해도 기존 토픽 ID 를 유지한다', () => {
+    registerUserMessage('topic-sess-2', '1', '이름', '연락처', 8);
+    registerUserMessage('topic-sess-2', '2', '이름', '연락처');
+
+    expect(getSessionByTopicId(8)?.sessionId).toBe('topic-sess-2');
+  });
+
+  it('등록되지 않은 토픽 ID 는 undefined 를 돌려준다', () => {
+    expect(getSessionByTopicId(999999)).toBeUndefined();
+  });
+
+  it('게이트웨이 복원 시 저장된 토픽 ID 가 되살아난다', async () => {
+    vi.stubEnv('ASSIST_GATEWAY_URL', URL_BASE);
+    vi.stubEnv('ASSIST_GATEWAY_TOKEN', TOKEN);
+    const meta = {
+      sessionId: 'restored-topic', senderName: 'R', contact: 'c',
+      createdAt: 1, lastActiveAt: 2, unreadAdminCount: 0, telegramTopicId: 321,
+    };
+    vi.stubGlobal('fetch', vi.fn(async (url: string) =>
+      jsonResponse(200, String(url).includes('?limit=') ? { sessions: [meta] } : { session: meta, messages: [] })
+    ));
+    await syncSessionsFromGateway();
+    vi.unstubAllGlobals();
+
+    expect(getSessionByTopicId(321)?.sessionId).toBe('restored-topic');
   });
 });

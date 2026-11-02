@@ -27,6 +27,7 @@ export interface SessionInfo {
   status: 'idle' | 'seen' | 'typing';
   lastTypingAt?: number;
   unreadAdminCount: number;
+  telegramTopicId?: number;
   messages: RelayMessage[];
 }
 
@@ -54,6 +55,7 @@ async function persistSessionAndMessageAsync(session: SessionInfo, message: Rela
     createdAt: session.createdAt,
     lastActiveAt: session.lastActiveAt,
     unreadAdminCount: session.unreadAdminCount,
+    telegramTopicId: session.telegramTopicId,
   });
   if (!upserted) return;
 
@@ -70,7 +72,8 @@ export function registerUserMessage(
   sessionId: string,
   text: string,
   senderName: string = '방문자',
-  contact: string = '미제공'
+  contact: string = '미제공',
+  telegramTopicId?: number
 ): RelayMessage {
   const cleanId = sessionId.trim();
   const now = Date.now();
@@ -92,6 +95,7 @@ export function registerUserMessage(
   const session = store.get(cleanId)!;
   session.senderName = senderName || session.senderName;
   session.contact = contact || session.contact;
+  session.telegramTopicId = telegramTopicId ?? session.telegramTopicId;
   session.lastActiveAt = now;
   session.unreadAdminCount += 1;
 
@@ -165,6 +169,23 @@ export function setAdminTyping(sessionId: string, isTyping: boolean) {
 }
 
 /**
+ * 텔레그램 포럼 토픽 ID 로 세션 조회 (토픽 수는 적어 선형 탐색으로 충분하고, 별도 인덱스의 stale 위험이 없다)
+ */
+export function getSessionByTopicId(topicId: number): SessionInfo | undefined {
+  for (const session of store.values()) {
+    if (session.telegramTopicId === topicId) return session;
+  }
+  return undefined;
+}
+
+/**
+ * 세션 ID 로 단건 조회
+ */
+export function getSessionById(sessionId: string): SessionInfo | undefined {
+  return store.get(sessionId.trim());
+}
+
+/**
  * 모든 세션 목록 조회 (관리자 대시보드용)
  */
 export function getAllSessions(): SessionInfo[] {
@@ -206,6 +227,7 @@ export async function syncSessionsFromGateway(): Promise<SessionInfo[]> {
       lastActiveAt: meta.lastActiveAt || Date.now(),
       status: 'idle',
       unreadAdminCount: meta.unreadAdminCount || 0,
+      telegramTopicId: meta.telegramTopicId,
       messages,
     });
   }
