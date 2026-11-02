@@ -51,8 +51,9 @@ export async function POST(req: NextRequest) {
     }
 
     const oldName = session.senderName;
-    const cleanName = (name && String(name).trim()) || oldName;
-    const cleanContact = (contact && String(contact).trim()) || session.contact || '미제공';
+    const rawName = (name && String(name).trim()) || oldName;
+    const cleanName = rawName.slice(0, 60);
+    const cleanContact = ((contact && String(contact).trim()) || session.contact || '미제공').slice(0, 100);
 
     const updated = updateSessionProfile(sessionId, cleanName, cleanContact);
 
