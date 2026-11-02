@@ -1,12 +1,12 @@
 // src/lib/chatStore.ts
-import { getFirestore, FIRESTORE_COLLECTIONS } from './firestore';
+import { getGatewayClient } from './gatewayClient';
 
 /**
- * Hybrid In-Memory + Cloud Firestore Chat Relay Store
- * 
- * - Hot Path (응답 지연 0ms 수렴): 인메모리 Map을 통해 독자 ↔ 상담사 간 실시간 타이핑 및 빠른 메시지 폴링 처리
- * - Cold Path (비동기 영속화): 메시지 발생 시 백그라운드로 Firestore에 비동기 저장하여 서버리스 컨테이너 재기동 후에도 데이터 보존
- * - Migration Ready: 전용 컬렉션 'domlog_chat_sessions' 및 서브컬렉션 'messages' 구조로 향후 독립 DB 이전 지원
+ * Hybrid In-Memory + Assist WAS Gateway Chat Relay Store
+ *
+ * - Hot Path (응답 지연 0ms 수렴): 인메모리 Map으로 타이핑 및 빠른 메시지 폴링 처리 (게이트웨이 호출 0회)
+ * - Cold Path (비동기 영속화): 메시지 발생 시 assist 게이트웨이로 비동기 전송 (Firestore 접근은 게이트웨이만 한다)
+ * - 게이트웨이 환경변수가 없으면 인메모리로만 동작한다
  */
 
 export interface RelayMessage {
@@ -40,42 +40,30 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /**
- * Firestore 비동기 저장 헬퍼 (사용자 응답 경로를 블로킹하지 않음)
+ * 게이트웨이 비동기 저장 헬퍼 (사용자 응답 경로를 블로킹하지 않음)
+ * 클라이언트는 던지지 않으므로 실패는 로그로만 남는다.
  */
 async function persistSessionAndMessageAsync(session: SessionInfo, message: RelayMessage) {
-  try {
-    const firestore = getFirestore();
-    if (!firestore) return;
+  const client = getGatewayClient();
+  if (!client) return;
 
-    const sessionRef = firestore.collection(FIRESTORE_COLLECTIONS.SESSIONS).doc(session.sessionId);
+  const upserted = await client.upsertSession({
+    sessionId: session.sessionId,
+    senderName: session.senderName,
+    contact: session.contact,
+    createdAt: session.createdAt,
+    lastActiveAt: session.lastActiveAt,
+    unreadAdminCount: session.unreadAdminCount,
+  });
+  if (!upserted) return;
 
-    // 세션 메타데이터 Upsert
-    await sessionRef.set(
-      {
-        sessionId: session.sessionId,
-        senderName: session.senderName,
-        contact: session.contact,
-        createdAt: session.createdAt,
-        lastActiveAt: session.lastActiveAt,
-        unreadAdminCount: session.unreadAdminCount,
-        updatedAt: Date.now(),
-      },
-      { merge: true }
-    );
-
-    // 메시지 서브컬렉션 문서 저장
-    await sessionRef.collection(FIRESTORE_COLLECTIONS.MESSAGES).doc(message.id).set({
-      id: message.id,
-      sessionId: message.sessionId,
-      sender: message.sender,
-      text: message.text,
-      timestamp: message.timestamp,
-      timeString: message.timeString,
-      createdAt: Date.now(),
-    });
-  } catch (err) {
-    console.error(`[Firestore Persistence Error] session=${session.sessionId} msg=${message.id}:`, err);
-  }
+  await client.appendMessage(session.sessionId, {
+    id: message.id,
+    sender: message.sender,
+    text: message.text,
+    timestamp: message.timestamp,
+    timeString: message.timeString,
+  });
 }
 
 export function registerUserMessage(
@@ -118,7 +106,7 @@ export function registerUserMessage(
 
   session.messages.push(msg);
 
-  // Firestore 비동기 영속화 (fire-and-forget)
+  // 게이트웨이 비동기 영속화 (fire-and-forget)
   persistSessionAndMessageAsync(session, msg).catch(() => {});
 
   return msg;
@@ -158,7 +146,7 @@ export function addAdminMessage(sessionId: string, text: string): RelayMessage {
 
   session.messages.push(msg);
 
-  // Firestore 비동기 영속화 (fire-and-forget)
+  // 게이트웨이 비동기 영속화 (fire-and-forget)
   persistSessionAndMessageAsync(session, msg).catch(() => {});
 
   return msg;
@@ -185,55 +173,41 @@ export function getAllSessions(): SessionInfo[] {
 }
 
 /**
- * Firestore로부터 세션 복원 또는 최신화 (서버리스 Cold Start 대비)
+ * 게이트웨이로부터 세션 복원 또는 최신화 (서버리스 Cold Start 대비)
+ * 메모리에 이미 있는 세션은 건드리지 않는다.
  */
-export async function syncSessionsFromFirestore(): Promise<SessionInfo[]> {
-  try {
-    const firestore = getFirestore();
-    if (!firestore) return getAllSessions();
+export async function syncSessionsFromGateway(): Promise<SessionInfo[]> {
+  const client = getGatewayClient();
+  if (!client) return getAllSessions();
 
-    const snapshot = await firestore
-      .collection(FIRESTORE_COLLECTIONS.SESSIONS)
-      .orderBy('lastActiveAt', 'desc')
-      .limit(50)
-      .get();
+  const metas = await client.listSessions(50);
+  if (!metas) return getAllSessions();
 
-    for (const doc of snapshot.docs) {
-      const data = doc.data();
-      const sId = data.sessionId;
-      if (!store.has(sId)) {
-        // 메시지 서브컬렉션 복원
-        const msgSnapshot = await doc.ref
-          .collection(FIRESTORE_COLLECTIONS.MESSAGES)
-          .orderBy('timestamp', 'asc')
-          .get();
+  for (const meta of metas) {
+    if (store.has(meta.sessionId)) continue;
 
-        const messages: RelayMessage[] = msgSnapshot.docs.map((mDoc) => {
-          const m = mDoc.data();
-          return {
-            id: m.id,
-            sessionId: sId,
-            sender: m.sender,
-            text: m.text,
-            timestamp: m.timestamp,
-            timeString: m.timeString,
-          };
-        });
+    const detail = await client.getSession(meta.sessionId);
+    if (!detail) continue;
 
-        store.set(sId, {
-          sessionId: sId,
-          senderName: data.senderName || '방문자',
-          contact: data.contact || '미제공',
-          createdAt: data.createdAt || Date.now(),
-          lastActiveAt: data.lastActiveAt || Date.now(),
-          status: 'idle',
-          unreadAdminCount: data.unreadAdminCount || 0,
-          messages,
-        });
-      }
-    }
-  } catch (err) {
-    console.warn('[Firestore Sync Warning] Failed to sync sessions from Firestore:', err);
+    const messages: RelayMessage[] = detail.messages.map((m) => ({
+      id: m.id,
+      sessionId: meta.sessionId,
+      sender: m.sender,
+      text: m.text,
+      timestamp: m.timestamp,
+      timeString: m.timeString,
+    }));
+
+    store.set(meta.sessionId, {
+      sessionId: meta.sessionId,
+      senderName: meta.senderName || '방문자',
+      contact: meta.contact || '미제공',
+      createdAt: meta.createdAt || Date.now(),
+      lastActiveAt: meta.lastActiveAt || Date.now(),
+      status: 'idle',
+      unreadAdminCount: meta.unreadAdminCount || 0,
+      messages,
+    });
   }
 
   return getAllSessions();

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllSessions, syncSessionsFromFirestore, addAdminMessage, setAdminTyping } from '@/lib/chatStore';
+import { getAllSessions, syncSessionsFromGateway, addAdminMessage, setAdminTyping } from '@/lib/chatStore';
 
 export async function GET() {
-  // 인메모리 세션이 비어있는 경우(서버리스 콜드 스타트 등) Firestore에서 비동기 복원
+  // 인메모리 세션이 비어있는 경우(서버리스 콜드 스타트 등) 게이트웨이에서 비동기 복원
   let sessions = getAllSessions();
   if (sessions.length === 0) {
-    sessions = await syncSessionsFromFirestore();
+    sessions = await syncSessionsFromGateway();
   }
 
   return NextResponse.json({
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, typing: isTyping });
     }
 
-    // 2. 답변 전송 이벤트 (RAM + 비동기 Firestore)
+    // 2. 답변 전송 이벤트 (RAM + 비동기 게이트웨이)
     if (action === 'send') {
       if (!text || typeof text !== 'string' || !text.trim()) {
         return NextResponse.json({ success: false, error: '답변 내용을 입력해주세요.' }, { status: 400 });
