@@ -1,11 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { registerUserMessage } from '@/lib/chatStore';
+import { registerUserMessage, getSessionById } from '@/lib/chatStore';
 
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+// 실패는 undefined — 호출 쪽은 토픽 없이 그룹 본방으로 전달한다. 로그에 응답 본문은 남기지 않는다.
+async function createForumTopic(botToken: string, chatId: string, name: string): Promise<number | undefined> {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/createForumTopic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, name }),
+    });
+    if (!res.ok) {
+      console.error(`Telegram createForumTopic failed: status=${res.status}`);
+      return undefined;
+    }
+    const data = await res.json();
+    const id = data?.result?.message_thread_id;
+    return typeof id === 'number' ? id : undefined;
+  } catch {
+    console.error('Telegram createForumTopic request error');
+    return undefined;
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -20,18 +41,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const senderName = escapeHtml((name && String(name).trim()) || '방문자');
+    const rawName = ((name && String(name).trim()) || '방문자').slice(0, 60);
+    const senderName = escapeHtml(rawName);
     const senderContact = escapeHtml((contact && String(contact).trim()) || '미제공');
     const senderMessage = escapeHtml(String(message).trim());
     const cleanSessionId = (sessionId && String(sessionId).trim()) || Math.random().toString(36).substring(2, 10);
     const sessionTag = escapeHtml(cleanSessionId);
     const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
-    // 1. In-Memory ChatStore 세션에 등록 (관리자 앱에서 실시간 감지 가능)
-    registerUserMessage(cleanSessionId, senderMessage, senderName, senderContact);
-
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    // 세션당 포럼 토픽 하나 — 이미 있으면 재사용, 없으면 생성 (실패해도 문의 전달은 계속)
+    let topicId = getSessionById(cleanSessionId)?.telegramTopicId;
+    if (topicId === undefined && botToken && chatId) {
+      topicId = await createForumTopic(botToken, chatId, `[방문자] ${rawName} (#sess-${cleanSessionId})`);
+    }
+
+    // 1. In-Memory ChatStore 세션에 등록 (관리자 앱에서 실시간 감지 가능)
+    registerUserMessage(cleanSessionId, senderMessage, senderName, senderContact, topicId);
 
     if (!botToken || !chatId) {
       // In development or if credentials missing, return graceful mock acknowledgment
@@ -50,7 +78,7 @@ export async function POST(req: NextRequest) {
     telegramText += `• <b>접수 시각</b>: ${now}\n`;
     telegramText += `• <b>문의 내용</b>:\n${senderMessage}\n`;
     telegramText += `━━━━━━━━━━━━━━━━━━━━\n`;
-    telegramText += `<i>Tip: 관리자 웹 앱(/admin/chat) 또는 텔레그램 답장(Reply)으로 실시간 응답할 수 있습니다.</i>`;
+    telegramText += `<i>Tip: 관리자 웹 앱(/admin/chat) 또는 이 토픽에 바로 입력해 실시간 응답할 수 있습니다.</i>`;
 
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
@@ -61,6 +89,7 @@ export async function POST(req: NextRequest) {
         chat_id: chatId,
         text: telegramText,
         parse_mode: 'HTML',
+        ...(topicId !== undefined && { message_thread_id: topicId }),
       }),
     });
 
