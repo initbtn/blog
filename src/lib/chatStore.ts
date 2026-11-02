@@ -169,6 +169,45 @@ export function setAdminTyping(sessionId: string, isTyping: boolean) {
 }
 
 /**
+ * 1차 질의 후 사용자가 성함/연락처를 입력했을 때 세션 프로필 갱신
+ */
+export function updateSessionProfile(
+  sessionId: string,
+  senderName: string,
+  contact?: string
+): SessionInfo | undefined {
+  const cleanId = sessionId.trim();
+  if (!store.has(cleanId)) return undefined;
+
+  const session = store.get(cleanId)!;
+  if (senderName && senderName.trim()) {
+    session.senderName = senderName.trim();
+  }
+  if (contact !== undefined) {
+    session.contact = contact.trim() || '미제공';
+  }
+  session.lastActiveAt = Date.now();
+
+  // 게이트웨이 비동기 메타 동기화 (fire-and-forget)
+  const client = getGatewayClient();
+  if (client) {
+    client
+      .upsertSession({
+        sessionId: session.sessionId,
+        senderName: session.senderName,
+        contact: session.contact,
+        createdAt: session.createdAt,
+        lastActiveAt: session.lastActiveAt,
+        unreadAdminCount: session.unreadAdminCount,
+        telegramTopicId: session.telegramTopicId,
+      })
+      .catch(() => {});
+  }
+
+  return session;
+}
+
+/**
  * 텔레그램 포럼 토픽 ID 로 세션 조회 (토픽 수는 적어 선형 탐색으로 충분하고, 별도 인덱스의 stale 위험이 없다)
  */
 export function getSessionByTopicId(topicId: number): SessionInfo | undefined {
