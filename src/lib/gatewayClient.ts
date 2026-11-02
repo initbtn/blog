@@ -10,6 +10,7 @@ export interface GatewaySessionMeta {
   createdAt: number;
   lastActiveAt: number;
   unreadAdminCount: number;
+  telegramTopicId?: number;
 }
 
 export interface GatewayMessage {

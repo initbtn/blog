@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addAdminMessage, setAdminTyping } from '@/lib/chatStore';
+import { addAdminMessage, setAdminTyping, getSessionByTopicId } from '@/lib/chatStore';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +14,21 @@ export async function POST(req: NextRequest) {
     const replyTo = message.reply_to_message;
     const text = message.text || '';
 
-    // 2. 관리자가 보낸 메시지인지 확인 (reply_to가 있는 경우)
+    // 2-a. 포럼 토픽 안의 메시지 — Reply 없이도 토픽 ID 로 세션을 식별한다
+    const topicId = message.message_thread_id;
+    if (typeof topicId === 'number' && text.trim() && !message.from?.is_bot) {
+      const session = getSessionByTopicId(topicId);
+      if (session) {
+        if (text.trim() === '/typing' || text.trim() === '...') {
+          setAdminTyping(session.sessionId, true);
+          return NextResponse.json({ ok: true, status: 'typing set' });
+        }
+        addAdminMessage(session.sessionId, text.trim());
+        return NextResponse.json({ ok: true, deliveredTo: session.sessionId });
+      }
+    }
+
+    // 2-b. 관리자가 보낸 메시지인지 확인 (reply_to가 있는 경우)
     if (replyTo && replyTo.text) {
       const origText = replyTo.text;
 
