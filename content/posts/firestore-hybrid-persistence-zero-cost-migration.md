@@ -7,8 +7,8 @@ tags: ["Firestore", "NoSQL", "Serverless", "Architecture", "FreeTier", "Next.js"
 draft: false
 ---
 
-> **BaaS 없이 구축하는 제로 트러스트 실시간 채팅 아키텍처 — 3부작 완결편**
-> 1편 [WAS ↔ 텔레그램 봇 릴레이](/posts/zero-secret-realtime-telegram-chatbot-was) · 2편 [소켓 vs SSE vs 폴링, 그리고 쓰로틀링](/posts/realtime-chat-architecture-throttling-was-nosql) · **3편 NoSQL 하이브리드 영속화와 0원 설계**
+> **BaaS 없이 구축하는 제로 트러스트 실시간 채팅 아키텍처 — 4부작 시리즈**
+> 1편 [WAS ↔ 텔레그램 봇 릴레이](/posts/zero-secret-realtime-telegram-chatbot-was) · 2편 [소켓 vs SSE vs 폴링, 그리고 쓰로틀링](/posts/realtime-chat-architecture-throttling-was-nosql) · **3편 NoSQL 하이브리드 영속화와 0원 설계** · 4편 [포럼 토픽 격리와 점진적 온보딩 UX](/posts/telegram-forum-topics-conan-progressive-onboarding)
 
 ## 1. 계기: 재배포 한 번에 대화가 사라졌다
 
