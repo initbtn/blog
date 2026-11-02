@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2-b. 관리자가 보낸 메시지인지 확인 (reply_to가 있는 경우)
-    if (replyTo && replyTo.text) {
+    // 2-b. 관리자가 보낸 메시지인지 확인 (reply_to가 있는 경우, 봇 자신의 자동 메시지 제외)
+    if (replyTo && replyTo.text && !message.from?.is_bot) {
       const origText = replyTo.text;
 
       // 원본 메시지에 포함된 세션 태그 파싱 (#sess-xxxx 또는 #xxxx)

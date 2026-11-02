@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      reply: '소중한 메시지가 엔지니어에게 실시간 전송되었습니다! 남겨주신 연락처 또는 확인 후 신속히 답변드리겠습니다.',
+      reply: '소중한 메시지가 initbtn에게 실시간 전송되었습니다! 남겨주신 연락처 또는 확인 후 신속히 답변드리겠습니다.',
     });
   } catch (err: any) {
     console.error('API /api/contact error:', err);

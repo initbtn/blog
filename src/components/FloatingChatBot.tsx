@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, CheckCircle2, Loader2 } from 'lucide-react';
+import { getRandomCodename } from '@/lib/codenames';
 
 interface ChatMessage {
   id: string;
@@ -12,16 +13,22 @@ interface ChatMessage {
 
 export function FloatingChatBot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [codename, setCodename] = useState<string>('');
+  const [realName, setRealName] = useState<string>('');
+  const [contactInfo, setContactInfo] = useState<string>('');
+  const [showProfileCard, setShowProfileCard] = useState<boolean>(false);
+  const [isProfileSaved, setIsProfileSaved] = useState<boolean>(false);
+  const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: '안녕하세요! 👋 기술 문의나 협업 제안을 남겨주시면 관리자에게 텔레그램으로 전달되며, 관리자가 답장하면 이 화면에 실시간으로 표시됩니다.',
+      text: '안녕하세요! 👋 initbtn에게 기술 문의나 협업 제안을 남겨주시면 텔레그램으로 전달되며, initbtn이 답장하면 이 화면에 실시간으로 표시됩니다.',
       time: '방금',
     },
   ]);
   const [inputMessage, setInputMessage] = useState('');
-  const [contactInfo, setContactInfo] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isAdminTyping, setIsAdminTyping] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -29,20 +36,24 @@ export function FloatingChatBot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const sessionIdRef = useRef<string>('');
   const lastTimestampRef = useRef<number>(0);
+  const hasSentFirstMessageRef = useRef<boolean>(false);
 
-  // 세션 ID 초기화 (랜덤 8자리 영숫자)
+  // 세션 ID 및 코난 코드명 초기화
   useEffect(() => {
     if (!sessionIdRef.current) {
       sessionIdRef.current = Math.random().toString(36).substring(2, 10);
     }
-  }, []);
+    if (!codename) {
+      setCodename(getRandomCodename());
+    }
+  }, [codename]);
 
   // 메시지 스크롤 최하단 이동
   useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen, isAdminTyping]);
+  }, [messages, isOpen, isAdminTyping, showProfileCard]);
 
   // 실시간 관리자 답장 & 타이핑 상태 폴링 루프 (채팅창 열려있을 때 2.5초 주기)
   useEffect(() => {
@@ -60,22 +71,31 @@ export function FloatingChatBot() {
           // 1. 관리자 타이핑 상태 업데이트
           setIsAdminTyping(data.status === 'typing');
 
-          // 2. 신규 도착한 관리자 메시지 추가
+          // 2. 신규 도착한 관리자 메시지만 필터링 수신 (본인 메시지 둔갑 원천 차단)
           if (data.messages && data.messages.length > 0) {
-            const incoming: ChatMessage[] = data.messages.map((m: any) => ({
-              id: m.id,
-              sender: 'admin',
-              text: m.text,
-              time: m.timeString || '방금',
-            }));
+            const incomingAdmin: ChatMessage[] = data.messages
+              .filter((m: any) => m.sender === 'admin')
+              .map((m: any) => ({
+                id: m.id,
+                sender: 'admin',
+                text: m.text,
+                time: m.timeString || '방금',
+              }));
 
-            setMessages((prev) => [...prev, ...incoming]);
+            if (incomingAdmin.length > 0) {
+              setMessages((prev) => {
+                const existingIds = new Set(prev.map((p) => p.id));
+                const newUnique = incomingAdmin.filter((m) => !existingIds.has(m.id));
+                return newUnique.length > 0 ? [...prev, ...newUnique] : prev;
+              });
+            }
+
             const maxTimestamp = Math.max(...data.messages.map((m: any) => m.timestamp));
             lastTimestampRef.current = maxTimestamp;
             setIsAdminTyping(false);
           }
         }
-      } catch (err) {
+      } catch {
         // silent fail on network glitch
       }
     }, 2500);
@@ -102,13 +122,16 @@ export function FloatingChatBot() {
     setIsSending(true);
     setStatusMessage(null);
 
+    const currentName = realName.trim() || codename || '익명';
+    const currentContact = contactInfo.trim() || '미제공';
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: '블로그 독자',
-          contact: contactInfo.trim() || '미제공 (익명)',
+          name: currentName,
+          contact: currentContact,
           message: userText,
           sessionId: sessionIdRef.current,
         }),
@@ -118,6 +141,11 @@ export function FloatingChatBot() {
 
       if (res.ok && data.success) {
         setStatusMessage('텔레그램 알림 발송 완료');
+        // 첫 질의 직후 연락처/이름 입력 카드 노출
+        if (!hasSentFirstMessageRef.current && !isProfileSaved) {
+          hasSentFirstMessageRef.current = true;
+          setShowProfileCard(true);
+        }
       } else {
         throw new Error(data.error || '메시지 전송에 실패했습니다.');
       }
@@ -133,6 +161,59 @@ export function FloatingChatBot() {
       setIsSending(false);
     }
   };
+
+  const handleSaveProfile = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isSavingProfile) return;
+    setIsSavingProfile(true);
+
+    const submittedName = realName.trim() || codename;
+    const submittedContact = contactInfo.trim();
+
+    try {
+      await fetch('/api/contact/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: sessionIdRef.current,
+          name: submittedName,
+          contact: submittedContact,
+        }),
+      });
+
+      setIsProfileSaved(true);
+      setShowProfileCard(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `sys-${Date.now()}`,
+          sender: 'bot',
+          text: `✅ 성함이 '${submittedName}'님으로 등록되었습니다. (회신처: ${submittedContact || '미제공'})`,
+          time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } catch {
+      setShowProfileCard(false);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleSkipProfile = () => {
+    setShowProfileCard(false);
+    setIsProfileSaved(true);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `sys-${Date.now()}`,
+        sender: 'bot',
+        text: `🕶️ 코드명 '${codename}'님으로 익명 대화를 지속합니다.`,
+        time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+      },
+    ]);
+  };
+
+  const currentDisplayName = realName.trim() || codename;
 
   return (
     <aside
@@ -156,7 +237,7 @@ export function FloatingChatBot() {
                 <p className="text-[10px] font-mono text-slate-400">
                   {isAdminTyping ? (
                     <span className="text-amber-400 font-semibold flex items-center gap-1">
-                      <span>엔지니어 확인 중</span>
+                      <span>initbtn 확인 중</span>
                       <span className="inline-flex gap-0.5">
                         <span className="w-1 h-1 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                         <span className="w-1 h-1 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -164,7 +245,10 @@ export function FloatingChatBot() {
                       </span>
                     </span>
                   ) : (
-                    '양방향 텔레그램 릴레이 활성'
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <span>코드명:</span>
+                      <span className="text-sky-300 font-semibold">{currentDisplayName || '요원'}</span>
+                    </span>
                   )}
                 </p>
               </div>
@@ -176,17 +260,6 @@ export function FloatingChatBot() {
             >
               <X className="w-4 h-4" />
             </button>
-          </div>
-
-          {/* Contact Input (Optional) */}
-          <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 shrink-0">
-            <input
-              type="text"
-              value={contactInfo}
-              onChange={(e) => setContactInfo(e.target.value)}
-              placeholder="회신받으실 이메일 또는 연락처 (선택)"
-              className="w-full text-[11px] bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-sky-500/50"
-            />
           </div>
 
           {/* Messages Scroll Area */}
@@ -214,7 +287,7 @@ export function FloatingChatBot() {
                   <div className={`max-w-[80%] space-y-1 ${isUser ? 'items-end' : 'items-start'}`}>
                     {isAdmin && (
                       <span className="text-[10px] font-mono text-emerald-400 px-1 font-semibold">
-                        엔지니어의 직접 답변
+                        initbtn의 직접 답변
                       </span>
                     )}
                     <div
@@ -235,6 +308,57 @@ export function FloatingChatBot() {
                 </div>
               );
             })}
+
+            {/* 1차 질의 후 인라인 성함/연락처 등록 카드 */}
+            {showProfileCard && (
+              <div className="p-3.5 rounded-2xl bg-slate-900/95 border border-sky-500/40 shadow-xl space-y-2.5 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🕶️</span>
+                  <div>
+                    <p className="text-xs font-bold text-slate-100">
+                      반갑습니다, <span className="text-sky-400">코드명 {codename}</span>님!
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      initbtn이 부재중일 때 답변을 전달받으실 성함과 연락처를 남겨주세요.
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-1.5 pt-1">
+                  <input
+                    type="text"
+                    value={realName}
+                    onChange={(e) => setRealName(e.target.value)}
+                    placeholder={`성함 (미입력 시 '${codename}' 유지)`}
+                    className="w-full text-xs bg-slate-950/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+                  />
+                  <input
+                    type="text"
+                    value={contactInfo}
+                    onChange={(e) => setContactInfo(e.target.value)}
+                    placeholder="회신받으실 이메일 또는 연락처 (선택)"
+                    className="w-full text-xs bg-slate-950/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+                  />
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleSkipProfile}
+                    disabled={isSavingProfile}
+                    className="px-2.5 py-1 text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+                  >
+                    비밀 요원으로 남기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveProfile}
+                    disabled={isSavingProfile}
+                    className="px-3 py-1 text-[11px] font-semibold bg-sky-500 text-slate-950 rounded-lg hover:bg-sky-400 disabled:opacity-50 transition-colors"
+                  >
+                    {isSavingProfile ? '등록 중...' : '등록하기'}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Google-Style '...' Typing Indicator Animation */}
             {isAdminTyping && (
