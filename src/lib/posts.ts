@@ -4,6 +4,36 @@ import matter from 'gray-matter';
 import { marked } from 'marked';
 import type { Post, PostMeta } from '../types/post';
 
+// Configure marked with custom table renderer to support responsive Table-to-Card transform
+marked.use({
+  renderer: {
+    table(token) {
+      const headers = token.header.map((h: any) => this.parser.parseInline(h.tokens));
+      const headerHtml = `<thead><tr>${headers
+        .map((h: string, idx: number) => {
+          const align = token.align[idx] ? ` align="${token.align[idx]}"` : '';
+          return `<th${align}>${h}</th>`;
+        })
+        .join('')}</tr></thead>`;
+
+      let bodyHtml = '<tbody>';
+      for (const row of token.rows) {
+        bodyHtml += '<tr>';
+        row.forEach((cell: any, idx: number) => {
+          const text = this.parser.parseInline(cell.tokens);
+          const rawHeader = headers[idx] ? headers[idx].replace(/<[^>]*>/g, '').trim() : '';
+          const align = token.align[idx] ? ` align="${token.align[idx]}"` : '';
+          bodyHtml += `<td data-label="${rawHeader}"${align}>${text}</td>`;
+        });
+        bodyHtml += '</tr>';
+      }
+      bodyHtml += '</tbody>';
+
+      return `<table>${headerHtml}${bodyHtml}</table>`;
+    },
+  },
+});
+
 const POSTS_DIRECTORY = path.join(process.cwd(), 'content', 'posts');
 
 export function calculateReadingTime(text: string): string {

@@ -103,35 +103,104 @@ body {
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
-/* Responsive Table Styling for Markdown */
+/* Responsive Table Styling: Desktop (Grid) vs Mobile (Table-to-Card) */
 .prose table {
-  display: block;
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.75rem 0;
 }
 
-.prose table th,
-.prose table td {
-  border: 1px solid #334155;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  text-align: left;
+/* Desktop & Tablet (>= 768px): 표준 그리드 테이블 */
+@media (min-width: 768px) {
+  .prose table {
+    display: table;
+    border-collapse: collapse;
+  }
+
+  .prose table th,
+  .prose table td {
+    border: 1px solid #334155;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .prose table th {
+    background-color: rgba(30, 41, 59, 0.7);
+    color: #f8fafc;
+    font-weight: 600;
+  }
+
+  .prose table tr:nth-child(even) {
+    background-color: rgba(15, 23, 42, 0.4);
+  }
 }
 
-.prose table th {
-  background-color: rgba(30, 41, 59, 0.7);
-  color: #f8fafc;
-  font-weight: 600;
-  white-space: nowrap;
-}
+/* Mobile (< 768px): Table-to-Card Transform (스크롤 배제, 1 행 = 1 카드) */
+@media (max-width: 767px) {
+  .prose table {
+    display: block;
+    border: none;
+    background: transparent;
+  }
 
-.prose table tr:nth-child(even) {
-  background-color: rgba(15, 23, 42, 0.4);
+  .prose table thead {
+    display: none; /* 헤더 행 숨김 */
+  }
+
+  .prose table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .prose table tr {
+    display: block;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid #1e293b;
+    border-radius: 0.875rem;
+    padding: 0.875rem 1rem;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+  }
+
+  .prose table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.5rem 0;
+    border: none;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .prose table td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .prose table td:first-child {
+    padding-top: 0;
+  }
+
+  /* 헤더 라벨 의사 요소 자동 주입 */
+  .prose table td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #38bdf8;
+    text-align: left;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.01em;
+  }
 }
 
 /* Mermaid SVG and foreignObject styling fixes */
