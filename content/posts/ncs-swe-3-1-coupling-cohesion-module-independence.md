@@ -170,11 +170,8 @@ draft: false
 
 ---
 
-## 7. 추천 무료 특강 (YouTube)
+## 7. 공인 표준 및 참고 가이드
 
-개념을 탄탄히 다지고 암기 공식을 한 번에 정리할 수 있는 수험생 추천 명강의입니다:
-
-- **[흥달쌤 유튜브]** 정보처리기사 필기/실기 결합도·응집도 암기 비법 특강  
-  👉 [흥달쌤 채널 바로가기 (@HeungSsaem)](https://www.youtube.com/@HeungSsaem)
-- **[길벗 시나공]** 소프트웨어공학 모듈 독립성 및 팬인/팬아웃 계산 문제 완벽 정복  
-  👉 [시나공 IT 소프트웨어공학 플레이리스트](https://www.youtube.com/results?search_query=%EC%8B%9C%EB%82%98%EA%B3%B5+%EA%B2%B0%ED%95%A9%EB%8F%84+%EC%9D%91%EC%A7%91%EB%8F%84)
+- [위키백과: 결합도 (Coupling)](https://ko.wikipedia.org/wiki/%EA%B2%B0%ED%95%A9%EB%8F%84)
+- [위키백과: 응집도 (Cohesion)](https://ko.wikipedia.org/wiki/%EC%9D%91%EC%A7%91%EB%8F%84)
+- [IT위키: 모듈화 (Modularity)](https://itwiki.kr/w/%EB%AA%A8%EB%93%88%ED%99%94)

@@ -106,9 +106,8 @@ draft: false
 
 ---
 
-## 6. 추천 무료 특강 (YouTube)
+## 6. 공인 표준 및 참고 가이드
 
-개념을 탄탄히 다지고 실전 감각을 높일 수 있는 수험생 추천 명강의입니다:
-
-- **[길벗 시나공]** 소프트웨어 요구공학 프로세스 및 SRS 품질 요건 정리  
-  👉 [시나공 IT 요구사항 확인 플레이리스트](https://www.youtube.com/results?search_query=%EC%8B%9C%EB%82%98%EA%B3%B5+%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD+%ED%99%95%EC%9D%B8)
+- [위키백과: 기능 요구사항 (Functional Requirements)](https://ko.wikipedia.org/wiki/%EA%B8%B0%EB%8A%A5_%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
+- [IT위키: 비기능 요구사항 (Non-Functional Requirements)](https://itwiki.kr/w/%EB%B9%84%EA%B8%B0%EB%8A%A5_%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
+- [IEEE Computer Society: IEEE 830-1998 Recommended Practice for Software Requirements Specifications](https://standards.ieee.org/)

@@ -113,7 +113,8 @@ draft: false
 
 ---
 
-## 6. 추천 무료 특강 (YouTube)
+## 6. 공인 표준 및 참고 가이드
 
-- **[길벗 시나공]** 소프트웨어 분석 모델링: DFD와 자료사전 기호 완전 정복  
-  👉 [시나공 IT 요구사항 분석 모델링 플레이리스트](https://www.youtube.com/results?search_query=%EC%8B%9C%EB%82%98%EA%B3%B5+%EC%9E%90%EB%A3%8C%ED%9D%90%EB%A6%84%EB%8F%84+DFD)
+- [IT위키: 유스케이스 다이어그램 (Use Case Diagram)](https://itwiki.kr/w/%EC%9C%A0%EC%8A%A4%EC%BC%80%EC%9D%B4%EC%8A%A4_%EB%8B%A4%EC%9D%B4%EC%96%B4%EA%B7%B8%EB%9E%A8)
+- [IT위키: 자료흐름도 (DFD, Data Flow Diagram)](https://itwiki.kr/w/%EC%9E%90%EB%A3%8C%ED%9D%90%EB%A6%84%EB%8F%84)
+- [IBM Rational: UML Use Case Relationships Guide](https://www.ibm.com/docs/en)
