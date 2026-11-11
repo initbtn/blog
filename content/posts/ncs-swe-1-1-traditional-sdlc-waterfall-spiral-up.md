@@ -96,9 +96,8 @@ draft: false
 
 ---
 
-## 6. 추천 무료 특강 (YouTube)
+## 6. 공인 표준 및 참고 가이드
 
-개념을 입체적으로 다지고 머릿속에 구조를 각인할 수 있는 수험생 추천 명강의입니다:
-
-- **[길벗 시나공]** 소프트웨어 개발 생명주기(SDLC) 핵심 개념 요약  
-  👉 [시나공 IT 소프트웨어 공학 플레이리스트](https://www.youtube.com/results?search_query=%EC%8B%9C%EB%82%98%EA%B3%B5+%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4+%EC%83%9D%EB%AA%85%EC%A3%BC%EA%B8%B0)
+- [위키백과: 폭포수 모델 (Waterfall Model)](https://ko.wikipedia.org/wiki/%ED%8F%AD%ED%8F%AC%EC%88%98_%EB%AA%A8%EB%8D%88)
+- [IT위키: 나선형 모델 (Spiral Model)](https://itwiki.kr/w/%EB%82%98%EC%84%A0%ED%98%95_%EB%AA%A8%EB%8D%88)
+- [IBM Rational: Unified Process Best Practices](https://www.ibm.com/docs/en)
