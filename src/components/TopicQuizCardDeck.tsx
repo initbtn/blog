@@ -206,75 +206,94 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const scrappedCountInModule = allQuestions.filter((q) => scrappedIds.includes(q.id)).length;
 
   return (
-    <section className="glass-panel rounded-2xl p-5 sm:p-8 space-y-6 border border-sky-500/30 shadow-2xl relative overflow-hidden">
+    <section className="glass-panel rounded-2xl p-4 sm:p-6 space-y-4 border border-sky-500/20 shadow-xl relative overflow-hidden">
       {/* Background Accent Glow */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Header: Title & Global Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 text-xs font-mono font-semibold rounded bg-sky-500/20 text-sky-400 border border-sky-500/30">
-              {moduleCode} 실전 기출
+      {/* Top Header: Compact Title & Icon Toolbar */}
+      <div className="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+        {/* Left: Module Tag & Source */}
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="px-2 py-0.5 text-[11px] font-mono font-bold rounded bg-sky-500/15 text-sky-400 border border-sky-500/25 shrink-0">
+            {moduleCode}
+          </span>
+          {currentQ && (
+            <span className="text-xs text-slate-400 font-mono truncate">
+              {currentQ.source} • {currentQ.exam_title}
             </span>
-            {currentQ && (
-              <span className="text-xs text-slate-400 font-mono">
-                {currentQ.source} • {currentQ.exam_title}
-              </span>
-            )}
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-white mt-1">
-            {moduleTitle ? `${moduleTitle} 기출 완전정복` : '토픽별 기출 한 문항 학습'}
-          </h3>
+          )}
         </div>
 
-        {/* Global Controls: Mode Filter & Global Hint Switch */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Mode Tabs */}
-          <div className="flex items-center p-1 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-medium">
+        {/* Right: Minimal Compact Icon Toolbar */}
+        <div className="flex items-center gap-1 shrink-0">
+          {/* Mode Tabs (Icon Only) */}
+          <div className="flex items-center p-0.5 rounded-lg bg-slate-900/90 border border-slate-800/90">
             <button
               onClick={() => setFilterMode('all')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+              title={`전체 문항 (${allQuestions.length})`}
+              className={`p-1.5 rounded-md transition-colors ${
                 filterMode === 'all'
                   ? 'bg-sky-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>전체 ({allQuestions.length})</span>
             </button>
             <button
               onClick={() => setFilterMode('scrapped')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+              title={`스크랩 복습 (${scrappedCountInModule})`}
+              className={`p-1.5 rounded-md transition-colors relative ${
                 filterMode === 'scrapped'
-                  ? 'bg-amber-500 text-black font-semibold shadow-sm'
+                  ? 'bg-amber-500 text-black shadow-sm'
                   : 'text-slate-400 hover:text-amber-400'
               }`}
             >
               <Star className="w-3.5 h-3.5" />
-              <span>스크랩 ({scrappedCountInModule})</span>
+              {scrappedCountInModule > 0 && filterMode !== 'scrapped' && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400" />
+              )}
             </button>
           </div>
 
-          {/* Global Hint Toggle Switch (Consistent SVG Icon, No Emoji) */}
+          {/* Global Hint Toggle (Icon Only) */}
           <button
             onClick={toggleGlobalHint}
-            title={globalHintEnabled ? '전체 힌트 끄기' : '전체 힌트 켜기'}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-mono transition-all ${
+            title={globalHintEnabled ? '힌트 끄기' : '힌트 켜기'}
+            className={`p-1.5 rounded-lg border transition-all ${
               globalHintEnabled
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm font-semibold'
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                 : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
           >
-            <Lightbulb className={`w-3.5 h-3.5 ${globalHintEnabled ? 'text-amber-400 fill-amber-400/20' : ''}`} />
-            <span>힌트 {globalHintEnabled ? 'ON' : 'OFF'}</span>
+            <Lightbulb
+              className={`w-3.5 h-3.5 ${globalHintEnabled ? 'text-amber-400 fill-amber-400/20' : ''}`}
+            />
           </button>
 
-          {/* Reset Current Card Button */}
+          {/* Scrap Current Question (Icon Only) */}
+          {currentQ && (
+            <button
+              onClick={() => toggleScrap(currentQ.id)}
+              title={isScrapped ? '스크랩 해제' : '문항 스크랩'}
+              className={`p-1.5 rounded-lg border transition-all ${
+                isScrapped
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-amber-400'
+              }`}
+            >
+              {isScrapped ? (
+                <BookmarkCheck className="w-3.5 h-3.5 text-amber-400" />
+              ) : (
+                <Bookmark className="w-3.5 h-3.5" />
+              )}
+            </button>
+          )}
+
+          {/* Reset Card (Icon Only) */}
           <button
             onClick={handleReset}
             title="다시 풀기"
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors border border-slate-800/80"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -283,79 +302,47 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
 
       {/* If No Questions in Scrapped Mode */}
       {activeQuestions.length === 0 ? (
-        <div className="py-12 text-center space-y-3">
-          <Bookmark className="w-10 h-10 text-slate-600 mx-auto" />
-          <p className="text-slate-300 font-medium">스크랩된 문항이 없습니다.</p>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            문제를 풀다가 오답이 나거나 다시 보고 싶은 문항에서 우측 상단의 북마크 버튼을 누르면
-            이곳에 자동으로 모입니다.
+        <div className="py-10 text-center space-y-2.5">
+          <Bookmark className="w-8 h-8 text-slate-600 mx-auto" />
+          <p className="text-slate-300 text-sm font-medium">스크랩된 문항이 없습니다.</p>
+          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+            문제를 풀다가 오답이 나거나 다시 볼 문항의 북마크 아이콘을 누르면 이곳에 모입니다.
           </p>
           <button
             onClick={() => setFilterMode('all')}
-            className="mt-2 px-4 py-2 text-xs font-semibold rounded-xl bg-sky-600/30 text-sky-400 border border-sky-500/40 hover:bg-sky-600/50"
+            className="mt-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600/30 text-sky-400 border border-sky-500/40 hover:bg-sky-600/50"
           >
             전체 문항 풀러가기
           </button>
         </div>
       ) : (
         <>
-          {/* Progress Header */}
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-            <div className="flex items-center gap-2">
-              <span className="text-sky-400 font-bold">
-                {currentIndex + 1} / {activeQuestions.length} 문항
-              </span>
-              {filterMode === 'scrapped' && (
-                <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px]">
-                  오답/스크랩 복습 모드
-                </span>
-              )}
+          {/* Progress Header & Counter */}
+          <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-0.5">
+            <span className="text-sky-400 font-bold">
+              {currentIndex + 1} / {activeQuestions.length}
+            </span>
+            <div className="w-36 sm:w-48 bg-slate-800/80 rounded-full h-1 overflow-hidden ml-3">
+              <div
+                className={`h-1 transition-all duration-300 ${
+                  filterMode === 'scrapped'
+                    ? 'bg-gradient-to-r from-amber-400 to-amber-600'
+                    : 'bg-gradient-to-r from-sky-400 to-blue-600'
+                }`}
+                style={{ width: `${((currentIndex + 1) / activeQuestions.length) * 100}%` }}
+              />
             </div>
-
-            {/* Scrap Bookmark Toggle Button */}
-            <button
-              onClick={() => toggleScrap(currentQ.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-mono transition-all ${
-                isScrapped
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold'
-                  : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:text-amber-400 hover:border-amber-500/30'
-              }`}
-            >
-              {isScrapped ? (
-                <>
-                  <BookmarkCheck className="w-4 h-4 text-amber-400" />
-                  <span>스크랩됨</span>
-                </>
-              ) : (
-                <>
-                  <Bookmark className="w-4 h-4" />
-                  <span>문항 스크랩</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
-            <div
-              className={`h-1.5 transition-all duration-300 ${
-                filterMode === 'scrapped'
-                  ? 'bg-gradient-to-r from-amber-400 to-amber-600'
-                  : 'bg-gradient-to-r from-sky-400 to-blue-600'
-              }`}
-              style={{ width: `${((currentIndex + 1) / activeQuestions.length) * 100}%` }}
-            />
           </div>
 
           {/* Question Card Box */}
-          <div className="space-y-5">
-            <div className="text-slate-100 font-medium text-base sm:text-lg leading-relaxed min-h-[4rem]">
-              <span className="text-sky-400 font-bold mr-2">Q{currentIndex + 1}.</span>
+          <div className="space-y-4">
+            <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed min-h-[3.5rem]">
+              <span className="text-sky-400 font-bold mr-1.5">Q{currentIndex + 1}.</span>
               {currentQ.question}
             </div>
 
             {/* Choices */}
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {currentQ.choices.map((choice) => {
                 const isThisSelected = selectedChoice === choice.number;
                 const isThisCorrect = choice.number === currentQ.answer;
@@ -381,25 +368,25 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
                   <button
                     key={choice.number}
                     onClick={() => handleSelectChoice(choice.number)}
-                    className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start gap-3.5 group cursor-pointer ${cardStyle}`}
+                    className={`w-full text-left p-3 sm:p-3.5 rounded-xl border transition-all flex items-start gap-3 group cursor-pointer ${cardStyle}`}
                   >
                     <span
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 border mt-0.5 transition-colors ${circleStyle}`}
+                      className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] shrink-0 border mt-0.5 transition-colors ${circleStyle}`}
                     >
                       {choice.number}
                     </span>
-                    <span className="text-sm sm:text-base leading-snug pt-0.5">{choice.text}</span>
+                    <span className="text-xs sm:text-sm leading-snug pt-0.5">{choice.text}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* Dedicated Hint Reserve Container (Zero CLS: Pre-allocated height to prevent layout shifts) */}
-            <div className="min-h-[4.25rem] transition-all duration-200">
+            {/* Dedicated Hint Reserve Container (Zero CLS: Pre-allocated height) */}
+            <div className="min-h-[3.75rem] transition-all duration-200">
               {globalHintEnabled ? (
-                <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs sm:text-sm text-amber-200 leading-relaxed animate-in fade-in duration-200">
-                  <div className="flex items-start gap-2.5">
-                    <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 fill-amber-400/20" />
+                <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-200 leading-relaxed animate-in fade-in duration-200">
+                  <div className="flex items-start gap-2">
+                    <Lightbulb className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5 fill-amber-400/20" />
                     <div>
                       <span className="font-mono font-bold text-amber-400 mr-1.5">[HINT]</span>
                       <span>{getQuestionHint(currentQ)}</span>
@@ -407,9 +394,9 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
                   </div>
                 </div>
               ) : (
-                <div className="h-full border border-dashed border-slate-800/50 rounded-xl flex items-center justify-center text-slate-600 text-xs font-mono select-none px-3 py-2.5">
-                  <span className="flex items-center gap-1.5 opacity-60">
-                    <Lightbulb className="w-3.5 h-3.5" />
+                <div className="h-full border border-dashed border-slate-800/40 rounded-xl flex items-center justify-center text-slate-600 text-[11px] font-mono select-none px-3 py-2">
+                  <span className="flex items-center gap-1.5 opacity-50">
+                    <Lightbulb className="w-3 h-3" />
                     상단 힌트 토글을 켜면 핵심 단서가 표시됩니다
                   </span>
                 </div>
@@ -420,26 +407,26 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
           {/* Answer & Explanation Toggle Panel */}
           {isAnswered && (
             <div
-              className={`p-4 sm:p-5 rounded-xl border space-y-2.5 transition-all animate-in fade-in slide-in-from-top-2 duration-300 ${
+              className={`p-3.5 sm:p-4 rounded-xl border space-y-2 transition-all animate-in fade-in slide-in-from-top-1 duration-200 ${
                 isCorrect
                   ? 'bg-emerald-950/20 border-emerald-500/30'
                   : 'bg-rose-950/20 border-rose-500/30'
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   {isCorrect ? (
                     <>
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                      <span className="font-bold text-emerald-400 text-sm sm:text-base">
-                        정답입니다! (정답: {currentQ.answer}번)
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span className="font-bold text-emerald-400 text-xs sm:text-sm">
+                        정답 (정답: {currentQ.answer}번)
                       </span>
                     </>
                   ) : (
                     <>
-                      <AlertCircle className="w-5 h-5 text-rose-400" />
-                      <span className="font-bold text-rose-400 text-sm sm:text-base">
-                        오답입니다. (정답: {currentQ.answer}번)
+                      <AlertCircle className="w-4 h-4 text-rose-400" />
+                      <span className="font-bold text-rose-400 text-xs sm:text-sm">
+                        오답 (정답: {currentQ.answer}번)
                       </span>
                     </>
                   )}
@@ -454,41 +441,41 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
               </div>
 
               {showExplanation && (
-                <div className="pt-2 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-slate-800 whitespace-pre-line font-sans">
+                <div className="pt-2 text-xs text-slate-300 leading-relaxed border-t border-slate-800 whitespace-pre-line font-sans">
                   {currentQ.explain || `정답은 ${currentQ.answer}번입니다.`}
                 </div>
               )}
             </div>
           )}
 
-          {/* Navigation Footer (Prev / Next Buttons) */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+          {/* Navigation Footer (Prev / Next Compact Buttons) */}
+          <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
             <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
-              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
                 currentIndex === 0
                   ? 'text-slate-600 bg-slate-900/40 cursor-not-allowed'
                   : 'text-slate-200 bg-slate-800/90 hover:bg-slate-700 hover:text-white shadow-sm'
               }`}
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>이전 문항</span>
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>이전</span>
             </button>
 
             <button
               onClick={handleNext}
               disabled={currentIndex === activeQuestions.length - 1}
-              className={`inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`inline-flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                 currentIndex === activeQuestions.length - 1
                   ? 'text-slate-600 bg-slate-900/40 cursor-not-allowed'
                   : filterMode === 'scrapped'
-                  ? 'text-black bg-amber-500 hover:bg-amber-400 shadow-md shadow-amber-500/20'
-                  : 'text-white bg-sky-600 hover:bg-sky-500 shadow-md shadow-sky-600/20'
+                  ? 'text-black bg-amber-500 hover:bg-amber-400 shadow-sm'
+                  : 'text-white bg-sky-600 hover:bg-sky-500 shadow-sm'
               }`}
             >
-              <span>다음 문항</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>다음</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </>
