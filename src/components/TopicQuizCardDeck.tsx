@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -50,6 +50,10 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const [globalHintEnabled, setGlobalHintEnabled] = useState(false);
   const [filterMode, setFilterMode] = useState<'all' | 'scrapped'>('all');
   const [scrappedIds, setScrappedIds] = useState<string[]>([]);
+
+  // Touch Swipe Gesture State
+  const touchStartXRef = useRef<number | null>(null);
+  const touchEndXRef = useRef<number | null>(null);
 
   // 1. Load preferences from localStorage
   useEffect(() => {
@@ -144,6 +148,46 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
     }
   };
 
+  // Desktop Keyboard Arrow Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, activeQuestions.length]);
+
+  // Mobile Touch Swipe Handlers (Min distance: 50px)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchEndXRef.current = null;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartXRef.current || !touchEndXRef.current) return;
+    const distance = touchStartXRef.current - touchEndXRef.current;
+    const minSwipeDistance = 50;
+
+    if (distance > minSwipeDistance) {
+      // Swiped Left -> Go Next
+      handleNext();
+    } else if (distance < -minSwipeDistance) {
+      // Swiped Right -> Go Prev
+      handlePrev();
+    }
+    touchStartXRef.current = null;
+    touchEndXRef.current = null;
+  };
+
   const handleSelectChoice = (choiceNum: number) => {
     setSelectedChoice(choiceNum);
     setShowExplanation(true);
@@ -206,12 +250,17 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const scrappedCountInModule = allQuestions.filter((q) => scrappedIds.includes(q.id)).length;
 
   return (
-    <section className="glass-panel rounded-2xl p-4 sm:p-6 space-y-4 border border-sky-500/20 shadow-xl relative overflow-hidden">
+    <section
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="glass-panel rounded-2xl p-4 sm:p-5 space-y-3.5 border border-sky-500/20 shadow-xl relative overflow-hidden select-none"
+    >
       {/* Background Accent Glow */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Header: Compact Title & Icon Toolbar */}
-      <div className="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+      {/* Top Header: Compact Title & Minimal Icon Toolbar */}
+      <div className="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
         {/* Left: Module Tag & Source */}
         <div className="flex items-center gap-2 min-w-0">
           <span className="px-2 py-0.5 text-[11px] font-mono font-bold rounded bg-sky-500/15 text-sky-400 border border-sky-500/25 shrink-0">
@@ -317,26 +366,57 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
         </div>
       ) : (
         <>
-          {/* Progress Header & Counter */}
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-0.5">
-            <span className="text-sky-400 font-bold">
-              {currentIndex + 1} / {activeQuestions.length}
-            </span>
-            <div className="w-36 sm:w-48 bg-slate-800/80 rounded-full h-1 overflow-hidden ml-3">
-              <div
-                className={`h-1 transition-all duration-300 ${
-                  filterMode === 'scrapped'
-                    ? 'bg-gradient-to-r from-amber-400 to-amber-600'
-                    : 'bg-gradient-to-r from-sky-400 to-blue-600'
+          {/* Progress Bar & Inline Stepper Icons Header */}
+          <div className="flex items-center justify-between gap-3 text-xs font-mono text-slate-400">
+            {/* Left: Current Progress & Progress Bar */}
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <span className="text-sky-400 font-bold shrink-0 text-xs">
+                {currentIndex + 1} / {activeQuestions.length}
+              </span>
+              <div className="w-full bg-slate-800/80 rounded-full h-1 overflow-hidden">
+                <div
+                  className={`h-1 transition-all duration-300 ${
+                    filterMode === 'scrapped'
+                      ? 'bg-gradient-to-r from-amber-400 to-amber-600'
+                      : 'bg-gradient-to-r from-sky-400 to-blue-600'
+                  }`}
+                  style={{ width: `${((currentIndex + 1) / activeQuestions.length) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Right: Integrated Stepper Navigation (< > Icons) */}
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+                title="이전 문항 (←)"
+                className={`p-1.5 rounded-lg border transition-all ${
+                  currentIndex === 0
+                    ? 'text-slate-700 bg-slate-900/30 border-slate-900 cursor-not-allowed'
+                    : 'text-slate-300 bg-slate-900/80 border-slate-800 hover:text-white hover:bg-slate-800 shadow-sm'
                 }`}
-                style={{ width: `${((currentIndex + 1) / activeQuestions.length) * 100}%` }}
-              />
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={currentIndex === activeQuestions.length - 1}
+                title="다음 문항 (→)"
+                className={`p-1.5 rounded-lg border transition-all ${
+                  currentIndex === activeQuestions.length - 1
+                    ? 'text-slate-700 bg-slate-900/30 border-slate-900 cursor-not-allowed'
+                    : 'text-sky-300 bg-sky-950/40 border-sky-600/40 hover:text-white hover:bg-sky-600 shadow-sm'
+                }`}
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
-          {/* Question Card Box */}
-          <div className="space-y-4">
-            <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed min-h-[3.5rem]">
+          {/* Question Card Box (Supports Touch Swipe) */}
+          <div className="space-y-3.5">
+            <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed min-h-[3rem]">
               <span className="text-sky-400 font-bold mr-1.5">Q{currentIndex + 1}.</span>
               {currentQ.question}
             </div>
@@ -368,7 +448,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
                   <button
                     key={choice.number}
                     onClick={() => handleSelectChoice(choice.number)}
-                    className={`w-full text-left p-3 sm:p-3.5 rounded-xl border transition-all flex items-start gap-3 group cursor-pointer ${cardStyle}`}
+                    className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 group cursor-pointer ${cardStyle}`}
                   >
                     <span
                       className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] shrink-0 border mt-0.5 transition-colors ${circleStyle}`}
@@ -382,7 +462,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
             </div>
 
             {/* Dedicated Hint Reserve Container (Zero CLS: Pre-allocated height) */}
-            <div className="min-h-[3.75rem] transition-all duration-200">
+            <div className="min-h-[3.5rem] transition-all duration-200">
               {globalHintEnabled ? (
                 <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-200 leading-relaxed animate-in fade-in duration-200">
                   <div className="flex items-start gap-2">
@@ -397,7 +477,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
                 <div className="h-full border border-dashed border-slate-800/40 rounded-xl flex items-center justify-center text-slate-600 text-[11px] font-mono select-none px-3 py-2">
                   <span className="flex items-center gap-1.5 opacity-50">
                     <Lightbulb className="w-3 h-3" />
-                    상단 힌트 토글을 켜면 핵심 단서가 표시됩니다
+                    상단 힌트 토글을 켜면 핵심 단서가 표시됩니다 (터치 스와이프로 다음 문항 이동)
                   </span>
                 </div>
               )}
@@ -407,7 +487,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
           {/* Answer & Explanation Toggle Panel */}
           {isAnswered && (
             <div
-              className={`p-3.5 sm:p-4 rounded-xl border space-y-2 transition-all animate-in fade-in slide-in-from-top-1 duration-200 ${
+              className={`p-3.5 rounded-xl border space-y-2 transition-all animate-in fade-in slide-in-from-top-1 duration-200 ${
                 isCorrect
                   ? 'bg-emerald-950/20 border-emerald-500/30'
                   : 'bg-rose-950/20 border-rose-500/30'
@@ -447,37 +527,6 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
               )}
             </div>
           )}
-
-          {/* Navigation Footer (Prev / Next Compact Buttons) */}
-          <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
-            <button
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-              className={`inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                currentIndex === 0
-                  ? 'text-slate-600 bg-slate-900/40 cursor-not-allowed'
-                  : 'text-slate-200 bg-slate-800/90 hover:bg-slate-700 hover:text-white shadow-sm'
-              }`}
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-              <span>이전</span>
-            </button>
-
-            <button
-              onClick={handleNext}
-              disabled={currentIndex === activeQuestions.length - 1}
-              className={`inline-flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-                currentIndex === activeQuestions.length - 1
-                  ? 'text-slate-600 bg-slate-900/40 cursor-not-allowed'
-                  : filterMode === 'scrapped'
-                  ? 'text-black bg-amber-500 hover:bg-amber-400 shadow-sm'
-                  : 'text-white bg-sky-600 hover:bg-sky-500 shadow-sm'
-              }`}
-            >
-              <span>다음</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
         </>
       )}
     </section>
