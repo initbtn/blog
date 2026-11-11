@@ -14,6 +14,7 @@ import {
   Layers,
   Lightbulb,
 } from 'lucide-react';
+import { FormattedQuestion } from './FormattedQuestion';
 
 export interface Choice {
   number: number;
@@ -416,10 +417,10 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
 
           {/* Question Card Box (Supports Touch Swipe) */}
           <div className="space-y-3.5">
-            <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed min-h-[3rem]">
-              <span className="text-sky-400 font-bold mr-1.5">Q{currentIndex + 1}.</span>
-              {currentQ.question}
-            </div>
+            <FormattedQuestion
+              questionIndex={currentIndex + 1}
+              rawText={currentQ.question}
+            />
 
             {/* Choices */}
             <div className="space-y-2">
