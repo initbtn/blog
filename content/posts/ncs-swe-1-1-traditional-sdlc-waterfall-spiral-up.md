@@ -1,0 +1,57 @@
+---
+title: "NCS 소프트웨어공학 [1-1] 전통적 SDLC 모델 비교: 폭포수 vs 나선형 vs 통합프로세스(UP)"
+slug: "ncs-swe-1-1-traditional-sdlc-waterfall-spiral-up"
+date: "2026-11-12"
+summary: "NCS M1 킬러 유형 1-1: 순차적 폭포수(Waterfall), 위험 분석 중심 나선형(Spiral) 4단계, 유스케이스 기반 통합 프로세스(UP) 4단계의 핵심 특징과 오답 함정 비교."
+tags: ["NCS", "소프트웨어공학", "SDLC", "폭포수모델", "나선형모델", "통합프로세스", "공무원7급"]
+draft: false
+---
+
+## 1. 출제 유형 개요: SDLC 프로세스 모델의 핵심 축
+
+NCS M1(개발 프로세스) 영역에서 전통적 생명주기 모델은 **각 모델이 탄생한 목적(위험 대응, 변경 수용 등)**과 **단계별 핵심 산출물 및 특징 짝짓기**를 묻는 문제가 반복 출제됩니다.
+
+```mermaid
+flowchart TD
+    SDLC["전통적 SDLC 모델 3대 축"]
+    
+    W["1. 폭포수 (Waterfall)<br>- 순차적 하향식 접근<br>- 요구사항 동결 전제"]
+    S["2. 나선형 (Spiral)<br>- 위험 분석(Risk Analysis) 중심<br>- 점증적 반복 프로토타이핑"]
+    U["3. 통합 프로세스 (UP/RUP)<br>- 도입 $\rightarrow$ 상세 $\rightarrow$ 구축 $\rightarrow$ 이행<br>- 아키텍처 조기 확정"]
+
+    SDLC --> W
+    SDLC --> S
+    SDLC --> U
+```
+
+---
+
+## 2. 모델별 핵심 비교표 및 기출 오답 포인트
+
+| 모델 | 핵심 메커니즘 | 단계별 프로세스 | 가장 빈출되는 시험 오답 함정 |
+| :--- | :--- | :--- | :--- |
+| **폭포수<br>(Waterfall)** | 고전적 순차 모델 (선행 단계 승인 후 다음 단계 진입) | 타당성검토 $\rightarrow$ 계획 $\rightarrow$ 요구분석 $\rightarrow$ 설계 $\rightarrow$ 구현 $\rightarrow$ 시험 $\rightarrow$ 유지보수 | *"사용자의 요구사항 변경에 유연하게 대응할 수 있다"* (X $\rightarrow$ 변경 수용 불가, 피드백 지연) |
+| **나선형<br>(Spiral)** | 보헴(Boehm) 제안, **위험(Risk) 최소화** 목적 | **계획 수립 $\rightarrow$ 위험 분석 $\rightarrow$ 공학 개발 $\rightarrow$ 고객 평가** | *"위험 분석 단계 없이 시제품을 바로 배포한다"* (X) / 4단계 순서를 거꾸로 섞음 |
+| **통합 프로세스<br>(UP/RUP)** | 유스케이스 기반, **아키텍처 중심**, 반복·점증 | **도입(Inception) $\rightarrow$ 상세(Elaboration) $\rightarrow$ 구축(Construction) $\rightarrow$ 이행(Transition)** | 상세 단계(Elaboration)에서 비즈니스 모델만 수립하고 아키텍처를 뒤로 미룬다고 왜곡 (X) |
+
+---
+
+## 3. 실전 기출 정밀 해설 (대표 2선)
+
+### Q1. 통합 프로세스(UP) 4단계 식별형 (2020 국가직 7급)
+> **Q. 소프트웨어 개발 단계를 시간의 흐름에 따라 네 개의 범주(도입, 상세, 구축, 이행)로 나누고, 각 범주마다 요구사항 도출부터 배포까지의 개발 작업을 반복하는 모델은?**  
+> ① 나선형 모델  
+> ② 폭포수 모델  
+> ③ 통합 프로세스(UP) 모델  
+> ④ RAD 모델  
+> **공인 정답: ③**  
+> **해설**: 도입(Inception), 상세(Elaboration), 구축(Construction), 이행(Transition) 4단계를 정의하고, 각 단계마다 반복(Iteration)을 수행하며 특히 **상세 단계에서 시스템 아키텍처를 조기에 확정**하는 모델은 **통합 프로세스(Unified Process)**입니다.
+
+### Q2. 나선형 모델 4단계 순서형 (정보처리기사)
+> **Q. 보헴이 제안한 나선형 모델(Spiral Model)의 프로젝트 수행 순서로 옳은 것은?**  
+> ① 계획 수립 $\rightarrow$ 위험 분석 $\rightarrow$ 개발 및 검증 $\rightarrow$ 고객 평가  
+> ② 위험 분석 $\rightarrow$ 계획 수립 $\rightarrow$ 고객 평가 $\rightarrow$ 개발 및 검증  
+> ③ 계획 수립 $\rightarrow$ 개발 및 검증 $\rightarrow$ 위험 분석 $\rightarrow$ 고객 평가  
+> ④ 고객 평가 $\rightarrow$ 계획 수립 $\rightarrow$ 위험 분석 $\rightarrow$ 개발 및 검증  
+> **공인 정답: ①**  
+> **해설**: 나선 회전마다 먼저 목표와 제약조건을 세우는 **계획 수립** $\rightarrow$ 대안을 식별하고 기술적 위험을 해소하는 **위험 분석** $\rightarrow$ 시제품 제작 및 **공학 개발** $\rightarrow$ 결과를 검토하는 **고객 평가** 순서로 진행됩니다.
