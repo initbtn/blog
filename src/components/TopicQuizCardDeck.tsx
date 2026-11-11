@@ -1,32 +1,34 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  ChevronLeft,
-  ChevronRight,
-  CheckCircle2,
-  AlertCircle,
   HelpCircle,
   RotateCcw,
-  Bookmark,
-  BookmarkCheck,
   Star,
-  Layers,
+  CheckCircle2,
+  AlertCircle,
   Lightbulb,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  Layers,
+  Filter,
 } from 'lucide-react';
 import { FormattedQuestion } from './FormattedQuestion';
 
-export interface Choice {
+interface Choice {
   number: number;
   text: string;
-  is_correct?: boolean;
+  is_correct: boolean;
 }
 
-export interface Question {
+interface Question {
   id: string;
-  source: string;
-  exam_title: string;
+  source?: string;
+  exam_title?: string;
+  chapter?: string;
   ncs_module: string;
+  subtopic_id?: string;
   ncs_title?: string;
   question: string;
   choices: Choice[];
@@ -36,20 +38,21 @@ export interface Question {
 
 interface TopicQuizCardDeckProps {
   moduleCode: string; // e.g. "M1", "M2"
+  subTopicCode?: string; // e.g. "1-1", "1-2"
   moduleTitle?: string;
 }
 
 const STORAGE_KEY = 'ncs_scrapped_questions_v1';
 const HINT_PREF_KEY = 'ncs_global_hint_enabled_v1';
 
-export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeckProps) {
+export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: TopicQuizCardDeckProps) {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [globalHintEnabled, setGlobalHintEnabled] = useState(false);
-  const [filterMode, setFilterMode] = useState<'all' | 'scrapped'>('all');
+  const [filterMode, setFilterMode] = useState<'subtopic' | 'all' | 'scrapped'>('subtopic');
   const [scrappedIds, setScrappedIds] = useState<string[]>([]);
   const [isJumpInputOpen, setIsJumpInputOpen] = useState(false);
   const [jumpInputValue, setJumpInputValue] = useState('');
@@ -93,47 +96,63 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
     loadQuestions();
   }, [moduleCode]);
 
+  // If subTopicCode is not provided, fallback to 'all'
+  useEffect(() => {
+    if (!subTopicCode) {
+      setFilterMode('all');
+    }
+  }, [subTopicCode]);
+
   // Active question list according to filter mode
   const activeQuestions = useMemo(() => {
     if (filterMode === 'scrapped') {
       return allQuestions.filter((q) => scrappedIds.includes(q.id));
     }
-    return allQuestions;
-  }, [allQuestions, filterMode, scrappedIds]);
-
-  // Adjust currentIndex when questions change
-  useEffect(() => {
-    if (currentIndex >= activeQuestions.length && activeQuestions.length > 0) {
-      setCurrentIndex(activeQuestions.length - 1);
+    if (filterMode === 'subtopic' && subTopicCode) {
+      const subFiltered = allQuestions.filter((q) => q.subtopic_id === subTopicCode);
+      return subFiltered.length > 0 ? subFiltered : allQuestions;
     }
+    return allQuestions;
+  }, [allQuestions, filterMode, subTopicCode, scrappedIds]);
+
+  // Reset index when filter changes
+  useEffect(() => {
+    setCurrentIndex(0);
     setSelectedChoice(null);
     setShowExplanation(false);
   }, [filterMode, activeQuestions.length]);
 
-  // Save scrapped IDs
+  // Toggle Scrap
   const toggleScrap = (id: string) => {
     setScrappedIds((prev) => {
       const updated = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       } catch (e) {
-        console.error('Failed to save scrap', e);
+        console.error('Failed to save scrap to storage', e);
       }
       return updated;
     });
   };
 
-  // Toggle global hint preference
+  // Toggle Global Hint Preference
   const toggleGlobalHint = () => {
-    setGlobalHintEnabled((prev) => {
-      const nextVal = !prev;
-      try {
-        localStorage.setItem(HINT_PREF_KEY, JSON.stringify(nextVal));
-      } catch (e) {
-        console.error('Failed to save hint preference', e);
-      }
-      return nextVal;
-    });
+    const nextState = !globalHintEnabled;
+    setGlobalHintEnabled(nextState);
+    try {
+      localStorage.setItem(HINT_PREF_KEY, JSON.stringify(nextState));
+    } catch (e) {
+      console.error('Failed to save hint preference to storage', e);
+    }
+  };
+
+  // Stepper handlers
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+      setSelectedChoice(null);
+      setShowExplanation(false);
+    }
   };
 
   const handleNext = () => {
@@ -144,29 +163,35 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
     }
   };
 
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
+  // Jump to Question handlers
+  const handleOpenJumpInput = () => {
+    setJumpInputValue(String(currentIndex + 1));
+    setIsJumpInputOpen(true);
+    setTimeout(() => {
+      jumpInputRef.current?.focus();
+      jumpInputRef.current?.select();
+    }, 50);
+  };
+
+  const handleCommitJump = () => {
+    const targetNum = parseInt(jumpInputValue.trim(), 10);
+    if (!isNaN(targetNum) && targetNum >= 1 && targetNum <= activeQuestions.length) {
+      setCurrentIndex(targetNum - 1);
       setSelectedChoice(null);
       setShowExplanation(false);
     }
+    setIsJumpInputOpen(false);
   };
 
-  // Desktop Keyboard Arrow Navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 'ArrowRight') {
-        handleNext();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrev();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, activeQuestions.length]);
+  const handleJumpKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCommitJump();
+    } else if (e.key === 'Escape') {
+      setIsJumpInputOpen(false);
+    }
+  };
 
-  // Mobile Touch Swipe Handlers (Min distance: 50px)
+  // Touch Swipe Handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
     touchEndXRef.current = null;
@@ -177,84 +202,80 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartXRef.current || !touchEndXRef.current) return;
-    const distance = touchStartXRef.current - touchEndXRef.current;
+    if (touchStartXRef.current === null || touchEndXRef.current === null) return;
+    const deltaX = touchStartXRef.current - touchEndXRef.current;
     const minSwipeDistance = 50;
 
-    if (distance > minSwipeDistance) {
-      // Swiped Left -> Go Next
+    if (deltaX > minSwipeDistance) {
+      // Swiped Left -> Next
       handleNext();
-    } else if (distance < -minSwipeDistance) {
-      // Swiped Right -> Go Prev
+    } else if (deltaX < -minSwipeDistance) {
+      // Swiped Right -> Prev
       handlePrev();
     }
+
     touchStartXRef.current = null;
     touchEndXRef.current = null;
   };
 
-  const handleSelectChoice = (choiceNum: number) => {
-    setSelectedChoice(choiceNum);
+  const handleChoiceSelect = (choiceNumber: number) => {
+    if (selectedChoice !== null) return; // Prevent changing after selection
+    setSelectedChoice(choiceNumber);
     setShowExplanation(true);
 
+    // Auto-scrap wrong answers
     const currentQ = activeQuestions[currentIndex];
-    if (currentQ && choiceNum !== currentQ.answer && !scrappedIds.includes(currentQ.id)) {
-      toggleScrap(currentQ.id);
-    }
-  };
-
-  const handleReset = () => {
-    setSelectedChoice(null);
-    setShowExplanation(false);
-  };
-
-  // Jump to specific question number
-  const handleOpenJump = () => {
-    setJumpInputValue(String(currentIndex + 1));
-    setIsJumpInputOpen(true);
-    setTimeout(() => {
-      jumpInputRef.current?.focus();
-      jumpInputRef.current?.select();
-    }, 50);
-  };
-
-  const handleJumpSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const targetNum = parseInt(jumpInputValue.trim(), 10);
-    if (!isNaN(targetNum) && targetNum >= 1 && targetNum <= activeQuestions.length) {
-      setCurrentIndex(targetNum - 1);
-      setSelectedChoice(null);
-      setShowExplanation(false);
-      setIsJumpInputOpen(false);
-    } else {
-      setIsJumpInputOpen(false);
+    if (currentQ && choiceNumber !== currentQ.answer) {
+      if (!scrappedIds.includes(currentQ.id)) {
+        toggleScrap(currentQ.id);
+      }
     }
   };
 
   // Generate question hint safely without spoiling the answer
   const getQuestionHint = (q: Question) => {
     const qText = q.question.toLowerCase();
+    const ex = q.explain || '';
+
+    // Specific domain principles
     if (qText.includes('나선형') || qText.includes('spiral')) {
-      return '나선형(Spiral) 모델의 4대 핵심 활동 중 가장 차별화되는 단계는 위험 분석(Risk Analysis)입니다. 대규모 고위험 프로젝트에 적용됩니다.';
+      return '나선형 모델의 4대 활동(계획-위험분석-공학개발-고객평가) 중 핵심 차별점은 위험 분석(Risk Analysis)입니다.';
     }
     if (qText.includes('폭포수') || qText.includes('waterfall')) {
-      return '폭포수 모델은 순차적·하향식이며 각 단계의 명확한 산출물 승인이 필수적입니다. 요구사항 변경 수용이 어렵습니다.';
+      return '폭포수 모델은 순차적·하향식 선형 모형으로 이전 단계 완료 및 명확한 산출물 검증 후 다음 단계로 진행합니다.';
     }
     if (qText.includes('스크럼') || qText.includes('scrum')) {
-      return '스크럼에서 리뷰(Review)는 제품 시연 및 피드백, 회고(Retrospective)는 팀의 일하는 방식 및 프로세스 개선에 초점을 둡니다.';
+      return '스크럼 활동의 목적을 대조하세요: 스프린트 리뷰는 제품 시연 및 피드백, 회고(Retrospective)는 팀 프로세스 개선입니다.';
     }
     if (qText.includes('xp') || qText.includes('익스트림')) {
-      return 'XP의 12대 실천 프랙티스(TDD, Pair Programming, Continuous Integration, Refactoring 등)와 5대 가치(용기, 단순성, 의사소통, 피드백, 존중)를 대조해보세요.';
+      return 'XP의 5대 가치(용기, 단순성, 의사소통, 피드백, 존중)와 12대 실천 프랙티스(TDD, 짝 프로그래밍, CI 등)를 점검하세요.';
     }
     if (qText.includes('애자일') || qText.includes('agile')) {
-      return '애자일 4대 선언문: 공정/도구보다는 개인과 상호작용, 포괄적 문서보다는 동작하는 소프트웨어, 계약 협상보다는 고객과의 협력, 계획 준수보다는 변화 대응.';
+      return '애자일 핵심 가치: 문서보다 동작하는 소프트웨어, 계획보다 변화 대응, 프로세스보다 개인과 상호작용, 협상보다 협력.';
     }
-    if (qText.includes('단위') || qText.includes('통합') || qText.includes('테스트')) {
-      return '테스트 단계별 목적: 단위(개별 모듈 격리 검증) → 통합(모듈 간 인터페이스/드라이버·스텁) → 시스템(요구사항 적합성) → 인수(사용자 동의).';
+    if (qText.includes('단위') || qText.includes('통합') || qText.includes('인수')) {
+      return '테스트 레벨별 목적: 단위(개별 컴포넌트 검증) → 통합(모듈 간 인터페이스) → 시스템(전체 기능/비기능) → 인수(사용자 요구 충족).';
     }
     if (qText.includes('결합도') || qText.includes('응집도')) {
-      return '결합도(낮을수록 우수: 자-스-제-외-공-내), 응집도(높을수록 우수: 우-논-시-절-통-순-기).';
+      return '결합도(낮을수록 우수: 자-스-제-외-공-내), 응집도(높을수록 우수: 우-논-시-절-통-순-기)의 서열 규칙을 확인하세요.';
     }
-    return `해당 문항은 [${q.ncs_module} 도메인]의 출제 빈출 영역입니다. 선지의 절대적 단어(항상, 오직, 불가능하다)나 선후 관계가 왜곡된 보기를 유의하여 소거법으로 접근해보세요.`;
+    if (qText.includes('리팩토링') || qText.includes('리팩터링')) {
+      return '리팩토링은 소프트웨어의 겉보기 동작(기능)은 그대로 유지하면서 내부 구조와 가독성을 개선하는 작업입니다.';
+    }
+    if (qText.includes('cpm') || qText.includes('임계')) {
+      return '임계 경로(Critical Path)는 프로젝트 완료를 위한 최장 경로이며, 여유 시간(Slack)이 0인 작업들로 이어집니다.';
+    }
+
+    // Dynamic extraction from explanation (remove spoilers)
+    if (ex.includes('[핵심 해설]')) {
+      const parts = ex.split('[핵심 해설]');
+      if (parts[1] && parts[1].length > 10) {
+        const clean = parts[1].replace(/\[.*?\]/g, '').trim();
+        return clean.length > 90 ? clean.substring(0, 90) + '...' : clean;
+      }
+    }
+
+    return `해당 문항은 [${q.ncs_module} 도메인]의 핵심 평가 영역입니다. 발문의 핵심 키워드와 각 선지의 정합성을 꼼꼼히 대조해보세요.`;
   };
 
   if (loading) {
@@ -275,38 +296,68 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const isCorrect = currentQ && selectedChoice === currentQ.answer;
 
   const scrappedCountInModule = allQuestions.filter((q) => scrappedIds.includes(q.id)).length;
+  const subTopicCount = subTopicCode ? allQuestions.filter((q) => q.subtopic_id === subTopicCode).length : 0;
 
   return (
-    <section
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      className="glass-panel rounded-2xl p-4 sm:p-5 space-y-3.5 border border-sky-500/20 shadow-xl relative overflow-hidden select-none"
-    >
-      {/* Background Accent Glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Top Header: Compact Title & Minimal Icon Toolbar */}
-      <div className="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
-        {/* Left: Module Tag & Source */}
+    <section className="glass-panel rounded-2xl p-4 sm:p-6 space-y-4 border border-sky-500/30 relative overflow-hidden shadow-2xl">
+      {/* Top Header Card */}
+      <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        {/* Left: Module Code, Subtopic & Question Counter */}
         <div className="flex items-center gap-2 min-w-0">
-          <span className="px-2 py-0.5 text-[11px] font-mono font-bold rounded bg-sky-500/15 text-sky-400 border border-sky-500/25 shrink-0">
-            {moduleCode}
+          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
+            {subTopicCode ? `${moduleCode} · ${subTopicCode}` : moduleCode}
           </span>
-          {currentQ && (
-            <span className="text-xs text-slate-400 font-mono truncate">
-              {currentQ.source} • {currentQ.exam_title}
-            </span>
+
+          {activeQuestions.length > 0 && (
+            <div className="flex items-center font-mono text-xs text-slate-300 shrink-0">
+              {isJumpInputOpen ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    ref={jumpInputRef}
+                    type="number"
+                    min={1}
+                    max={activeQuestions.length}
+                    value={jumpInputValue}
+                    onChange={(e) => setJumpInputValue(e.target.value)}
+                    onBlur={handleCommitJump}
+                    onKeyDown={handleJumpKeyDown}
+                    className="w-12 px-1 py-0.5 text-center text-xs font-mono font-bold bg-slate-950 text-sky-400 border border-sky-500 rounded outline-none shadow-sm"
+                  />
+                  <span className="text-slate-500">/ {activeQuestions.length}</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleOpenJumpInput}
+                  title="클릭하여 문항 번호 직접 입력"
+                  className="px-1.5 py-0.5 rounded bg-slate-800/80 hover:bg-slate-700/80 text-sky-300 font-bold hover:text-white transition-colors cursor-pointer border border-slate-700/60"
+                >
+                  {currentIndex + 1} <span className="text-slate-400 font-normal">/ {activeQuestions.length}</span>
+                </button>
+              )}
+            </div>
           )}
         </div>
 
         {/* Right: Minimal Compact Icon Toolbar */}
         <div className="flex items-center gap-1 shrink-0">
-          {/* Mode Tabs (Icon Only) */}
+          {/* Filter Mode Tabs */}
           <div className="flex items-center p-0.5 rounded-lg bg-slate-900/90 border border-slate-800/90">
+            {subTopicCode && (
+              <button
+                onClick={() => setFilterMode('subtopic')}
+                title={`주제별 기출 (${subTopicCount})`}
+                className={`p-1.5 rounded-md transition-colors ${
+                  filterMode === 'subtopic'
+                    ? 'bg-sky-600 text-white shadow-sm font-mono text-[11px] font-bold px-2'
+                    : 'text-slate-400 hover:text-slate-200 text-[11px] font-mono px-2'
+                }`}
+              >
+                {subTopicCode}
+              </button>
+            )}
             <button
               onClick={() => setFilterMode('all')}
-              title={`전체 문항 (${allQuestions.length})`}
+              title={`모듈 전체 문항 (${allQuestions.length})`}
               className={`p-1.5 rounded-md transition-colors ${
                 filterMode === 'all'
                   ? 'bg-sky-600 text-white shadow-sm'
@@ -331,7 +382,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
             </button>
           </div>
 
-          {/* Global Hint Toggle (Icon Only) */}
+          {/* Global Hint Toggle */}
           <button
             onClick={toggleGlobalHint}
             title={globalHintEnabled ? '힌트 끄기' : '힌트 켜기'}
@@ -345,208 +396,169 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
               className={`w-3.5 h-3.5 ${globalHintEnabled ? 'text-amber-400 fill-amber-400/20' : ''}`}
             />
           </button>
-
-          {/* Scrap Current Question (Icon Only) */}
-          {currentQ && (
-            <button
-              onClick={() => toggleScrap(currentQ.id)}
-              title={isScrapped ? '스크랩 해제' : '문항 스크랩'}
-              className={`p-1.5 rounded-lg border transition-all ${
-                isScrapped
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                  : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-amber-400'
-              }`}
-            >
-              {isScrapped ? (
-                <BookmarkCheck className="w-3.5 h-3.5 text-amber-400" />
-              ) : (
-                <Bookmark className="w-3.5 h-3.5" />
-              )}
-            </button>
-          )}
-
-          {/* Reset Card (Icon Only) */}
-          <button
-            onClick={handleReset}
-            title="다시 풀기"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800 transition-colors"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
 
-      {/* If No Questions in Scrapped Mode */}
+      {/* Progress Bar + Stepper Navigation */}
+      {activeQuestions.length > 0 && (
+        <div className="flex items-center gap-2">
+          {/* Stepper Left (<) */}
+          <button
+            onClick={handlePrev}
+            disabled={currentIndex === 0}
+            className={`p-1 rounded-md transition-all shrink-0 ${
+              currentIndex === 0
+                ? 'text-slate-600 cursor-not-allowed opacity-40'
+                : 'text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 shadow-sm active:scale-95'
+            }`}
+            title="이전 문항"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          {/* Progress Bar */}
+          <div className="flex-1 w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-sky-500 to-indigo-500 h-full transition-all duration-300 ease-out"
+              style={{
+                width: `${((currentIndex + 1) / activeQuestions.length) * 100}%`,
+              }}
+            />
+          </div>
+
+          {/* Stepper Right (>) */}
+          <button
+            onClick={handleNext}
+            disabled={currentIndex === activeQuestions.length - 1}
+            className={`p-1 rounded-md transition-all shrink-0 ${
+              currentIndex === activeQuestions.length - 1
+                ? 'text-slate-600 cursor-not-allowed opacity-40'
+                : 'text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 shadow-sm active:scale-95'
+            }`}
+            title="다음 문항"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Card Content with Touch Swipe Gesture */}
       {activeQuestions.length === 0 ? (
-        <div className="py-10 text-center space-y-2.5">
-          <Bookmark className="w-8 h-8 text-slate-600 mx-auto" />
-          <p className="text-slate-300 text-sm font-medium">스크랩된 문항이 없습니다.</p>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto">
-            문제를 풀다가 오답이 나거나 다시 볼 문항의 북마크 아이콘을 누르면 이곳에 모입니다.
-          </p>
+        <div className="py-12 text-center space-y-3">
+          <Star className="w-10 h-10 text-slate-600 mx-auto" />
+          <p className="text-slate-400 text-sm">해당 조건의 기출문항이 없습니다.</p>
           <button
             onClick={() => setFilterMode('all')}
-            className="mt-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600/30 text-sky-400 border border-sky-500/40 hover:bg-sky-600/50"
+            className="px-3 py-1.5 rounded-lg text-xs font-mono bg-sky-600/80 hover:bg-sky-600 text-white transition-colors"
           >
-            전체 문항 풀러가기
+            모듈 전체 문항 보기
           </button>
         </div>
       ) : (
         <>
-          {/* Progress Bar & Inline Stepper Icons Header */}
-          <div className="flex items-center justify-between gap-2.5 text-xs font-mono text-slate-400">
-            {/* Left: Interactive Question Number Jump & Progress Bar */}
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              {isJumpInputOpen ? (
-                <form onSubmit={handleJumpSubmit} className="flex items-center gap-1 shrink-0">
-                  <input
-                    ref={jumpInputRef}
-                    type="number"
-                    min={1}
-                    max={activeQuestions.length}
-                    value={jumpInputValue}
-                    onChange={(e) => setJumpInputValue(e.target.value)}
-                    onBlur={() => setIsJumpInputOpen(false)}
-                    className="w-14 px-1.5 py-0.5 text-center text-xs font-bold text-sky-400 bg-slate-900 border border-sky-500 rounded focus:outline-none focus:ring-1 focus:ring-sky-400"
-                  />
-                  <span className="text-slate-500 text-[11px]">/ {activeQuestions.length}</span>
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleOpenJump}
-                  title="클릭하여 문항 번호 직접 입력 이동"
-                  className="group flex items-center gap-1 shrink-0 px-2 py-0.5 -ml-1 rounded hover:bg-slate-800/80 transition-colors cursor-pointer"
-                >
-                  <span className="text-sky-400 font-bold group-hover:underline">
-                    {currentIndex + 1}
-                  </span>
-                  <span className="text-slate-500 text-[11px]">/ {activeQuestions.length}</span>
-                </button>
-              )}
+          <div
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            className="space-y-4 touch-pan-y"
+          >
+            {/* Exam Metadata Info Bar & Scrap Button */}
+            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 border-b border-slate-800/60 pb-2">
+              <div className="flex items-center gap-2 truncate">
+                <span className="px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-300">
+                  {currentQ.source || '공식기출'}
+                </span>
+                {currentQ.exam_title && <span className="truncate">{currentQ.exam_title}</span>}
+              </div>
+              <button
+                onClick={() => toggleScrap(currentQ.id)}
+                title={isScrapped ? '스크랩 해제' : '오답노트 스크랩'}
+                className={`p-1 rounded transition-colors ${
+                  isScrapped ? 'text-amber-400' : 'text-slate-500 hover:text-amber-300'
+                }`}
+              >
+                <Star className={`w-4 h-4 ${isScrapped ? 'fill-amber-400' : ''}`} />
+              </button>
+            </div>
 
-              <div className="w-full bg-slate-800/80 rounded-full h-1 overflow-hidden">
-                <div
-                  className={`h-1 transition-all duration-300 ${
-                    filterMode === 'scrapped'
-                      ? 'bg-gradient-to-r from-amber-400 to-amber-600'
-                      : 'bg-gradient-to-r from-sky-400 to-blue-600'
-                  }`}
-                  style={{ width: `${((currentIndex + 1) / activeQuestions.length) * 100}%` }}
-                />
+            {/* Smart Question Formatter */}
+            <FormattedQuestion questionIndex={currentIndex + 1} rawText={currentQ.question} />
+
+            {/* Zero-Layout-Shift Hint Box */}
+            <div
+              className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                globalHintEnabled
+                  ? 'bg-amber-500/5 border-amber-500/25 p-3 sm:p-3.5 opacity-100 max-h-48'
+                  : 'max-h-0 opacity-0 border-transparent p-0 m-0 pointer-events-none'
+              }`}
+            >
+              <div className="flex items-start gap-2.5">
+                <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <div className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider">
+                    핵심 개념 힌트
+                  </div>
+                  <p className="text-xs text-amber-200/90 leading-relaxed font-sans">
+                    {getQuestionHint(currentQ)}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Right: Integrated Stepper Navigation (< > Icons) */}
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                title="이전 문항 (←)"
-                className={`p-1.5 rounded-lg border transition-all ${
-                  currentIndex === 0
-                    ? 'text-slate-700 bg-slate-900/30 border-slate-900 cursor-not-allowed'
-                    : 'text-slate-300 bg-slate-900/80 border-slate-800 hover:text-white hover:bg-slate-800 shadow-sm'
-                }`}
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={currentIndex === activeQuestions.length - 1}
-                title="다음 문항 (→)"
-                className={`p-1.5 rounded-lg border transition-all ${
-                  currentIndex === activeQuestions.length - 1
-                    ? 'text-slate-700 bg-slate-900/30 border-slate-900 cursor-not-allowed'
-                    : 'text-sky-300 bg-sky-950/40 border-sky-600/40 hover:text-white hover:bg-sky-600 shadow-sm'
-                }`}
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Question Card Box (Supports Touch Swipe) */}
-          <div className="space-y-3.5">
-            <FormattedQuestion
-              questionIndex={currentIndex + 1}
-              rawText={currentQ.question}
-            />
-
-            {/* Choices */}
-            <div className="space-y-2">
+            {/* 4 Choices */}
+            <div className="space-y-2 pt-1">
               {currentQ.choices.map((choice) => {
-                const isThisSelected = selectedChoice === choice.number;
-                const isThisCorrect = choice.number === currentQ.answer;
+                const isSelected = selectedChoice === choice.number;
+                const isAnswer = choice.number === currentQ.answer;
 
-                let cardStyle =
-                  'border-slate-800/80 bg-slate-900/60 text-slate-200 hover:border-sky-500/40 hover:bg-slate-800/60';
-                let circleStyle = 'bg-slate-800 text-slate-400 border-slate-700';
+                let btnStyle =
+                  'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-800/40 text-slate-200';
+                let badgeStyle = 'bg-slate-800 text-slate-400';
 
                 if (isAnswered) {
-                  if (isThisCorrect) {
-                    cardStyle =
-                      'border-emerald-500/60 bg-emerald-950/30 text-emerald-200 font-medium';
-                    circleStyle = 'bg-emerald-500 text-black border-emerald-400 font-bold';
-                  } else if (isThisSelected && !isThisCorrect) {
-                    cardStyle = 'border-rose-500/60 bg-rose-950/30 text-rose-200';
-                    circleStyle = 'bg-rose-500 text-white border-rose-400 font-bold';
+                  if (isAnswer) {
+                    btnStyle =
+                      'bg-emerald-950/40 border-emerald-500/80 text-emerald-200 font-medium shadow-sm';
+                    badgeStyle = 'bg-emerald-500 text-black font-bold';
+                  } else if (isSelected && !isCorrect) {
+                    btnStyle =
+                      'bg-rose-950/40 border-rose-500/80 text-rose-200 font-medium shadow-sm';
+                    badgeStyle = 'bg-rose-500 text-white font-bold';
                   } else {
-                    cardStyle = 'border-slate-800/40 bg-slate-900/30 text-slate-500 opacity-60';
+                    btnStyle = 'opacity-50 border-slate-800 text-slate-400';
                   }
                 }
 
                 return (
                   <button
                     key={choice.number}
-                    onClick={() => handleSelectChoice(choice.number)}
-                    className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 group cursor-pointer ${cardStyle}`}
+                    disabled={isAnswered}
+                    onClick={() => handleChoiceSelect(choice.number)}
+                    className={`w-full p-3 sm:p-3.5 rounded-xl border text-left text-xs sm:text-sm transition-all duration-200 flex items-start gap-2.5 ${btnStyle}`}
                   >
                     <span
-                      className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] shrink-0 border mt-0.5 transition-colors ${circleStyle}`}
+                      className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[11px] font-mono transition-colors mt-0.5 ${badgeStyle}`}
                     >
                       {choice.number}
                     </span>
-                    <span className="text-xs sm:text-sm leading-snug pt-0.5">{choice.text}</span>
+                    <span className="leading-relaxed font-sans">{choice.text}</span>
                   </button>
                 );
               })}
             </div>
-
-            {/* Dedicated Hint Reserve Container (Zero CLS: Pre-allocated height) */}
-            <div className="min-h-[3.5rem] transition-all duration-200">
-              {globalHintEnabled ? (
-                <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-200 leading-relaxed animate-in fade-in duration-200">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5 fill-amber-400/20" />
-                    <div>
-                      <span className="font-mono font-bold text-amber-400 mr-1.5">[HINT]</span>
-                      <span>{getQuestionHint(currentQ)}</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="h-full border border-dashed border-slate-800/40 rounded-xl flex items-center justify-center text-slate-600 text-[11px] font-mono select-none px-3 py-2">
-                  <span className="flex items-center gap-1.5 opacity-50">
-                    <Lightbulb className="w-3 h-3" />
-                    상단 힌트 토글을 켜면 핵심 단서가 표시됩니다 (터치 스와이프로 다음 문항 이동)
-                  </span>
-                </div>
-              )}
-            </div>
           </div>
 
-          {/* Answer & Explanation Toggle Panel */}
+          {/* Answer Status & Explanation Accordion */}
           {isAnswered && (
             <div
-              className={`p-3.5 rounded-xl border space-y-2 transition-all animate-in fade-in slide-in-from-top-1 duration-200 ${
+              className={`rounded-xl p-3 sm:p-4 border transition-all space-y-2 animate-in fade-in-50 duration-200 ${
                 isCorrect
-                  ? 'bg-emerald-950/20 border-emerald-500/30'
-                  : 'bg-rose-950/20 border-rose-500/30'
+                  ? 'bg-emerald-950/20 border-emerald-500/40'
+                  : 'bg-rose-950/20 border-rose-500/40'
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   {isCorrect ? (
                     <>
                       <CheckCircle2 className="w-4 h-4 text-emerald-400" />

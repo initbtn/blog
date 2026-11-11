@@ -94,9 +94,13 @@ export default async function PostPage({ params }: PostPageProps) {
     },
   };
 
-  // Map slug to NCS module code if applicable (e.g. ncs-swe-module-1 or ncs-swe-1-1)
+  // Map slug to NCS module and subtopic code if applicable
+  // e.g. ncs-swe-1-1 -> moduleCode="M1", subTopicCode="1-1"
+  // e.g. ncs-swe-module-1 -> moduleCode="M1", subTopicCode=undefined
+  const subtopicMatch = slug.match(/ncs-swe-(\d+)-(\d+)/);
   const ncsMatch = slug.match(/ncs-swe-(?:module-)?(\d+)/);
   const moduleCode = ncsMatch ? `M${ncsMatch[1]}` : null;
+  const subTopicCode = subtopicMatch ? `${subtopicMatch[1]}-${subtopicMatch[2]}` : undefined;
 
   return (
     <article className="space-y-8">
@@ -165,6 +169,7 @@ export default async function PostPage({ params }: PostPageProps) {
       {moduleCode && (
         <TopicQuizCardDeck
           moduleCode={moduleCode}
+          subTopicCode={subTopicCode}
           moduleTitle={post.title}
         />
       )}
