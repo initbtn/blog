@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getAllPosts, getPostBySlug } from '../../../lib/posts';
+import { MermaidRenderer } from '../../../components/MermaidRenderer';
+import { TopicQuizCardDeck } from '../../../components/TopicQuizCardDeck';
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -90,6 +92,10 @@ export default async function PostPage({ params }: PostPageProps) {
     },
   };
 
+  // Map slug to NCS module code if applicable
+  const ncsMatch = slug.match(/ncs-swe-module-(\d+)/);
+  const moduleCode = ncsMatch ? `M${ncsMatch[1]}` : null;
+
   return (
     <article className="space-y-8">
       <script
@@ -143,11 +149,20 @@ export default async function PostPage({ params }: PostPageProps) {
 
       {/* Markdown Body */}
       <div className="glass-panel rounded-2xl p-6 sm:p-10">
+        <MermaidRenderer />
         <div
           className="prose prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-a:text-sky-400 hover:prose-a:underline prose-code:text-sky-300 prose-pre:border prose-pre:border-slate-800"
           dangerouslySetInnerHTML={{ __html: post.htmlContent }}
         />
       </div>
+
+      {/* Interactive Topic Quiz Card Deck */}
+      {moduleCode && (
+        <TopicQuizCardDeck
+          moduleCode={moduleCode}
+          moduleTitle={post.title}
+        />
+      )}
 
       {/* Post Footer */}
       <footer className="glass-panel rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
