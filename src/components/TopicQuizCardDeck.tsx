@@ -39,6 +39,7 @@ interface TopicQuizCardDeckProps {
 }
 
 const STORAGE_KEY = 'ncs_scrapped_questions_v1';
+const HINT_PREF_KEY = 'ncs_global_hint_enabled_v1';
 
 export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeckProps) {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
@@ -46,19 +47,23 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const [globalHintEnabled, setGlobalHintEnabled] = useState(false);
   const [filterMode, setFilterMode] = useState<'all' | 'scrapped'>('all');
   const [scrappedIds, setScrappedIds] = useState<string[]>([]);
 
-  // 1. Load scrapped questions from localStorage
+  // 1. Load preferences from localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setScrappedIds(JSON.parse(saved));
+      const savedScrap = localStorage.getItem(STORAGE_KEY);
+      if (savedScrap) {
+        setScrappedIds(JSON.parse(savedScrap));
+      }
+      const savedHint = localStorage.getItem(HINT_PREF_KEY);
+      if (savedHint !== null) {
+        setGlobalHintEnabled(JSON.parse(savedHint));
       }
     } catch (e) {
-      console.error('Failed to load scrapped questions from storage', e);
+      console.error('Failed to load preferences from storage', e);
     }
   }, []);
 
@@ -110,12 +115,24 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
     });
   };
 
+  // Toggle global hint preference
+  const toggleGlobalHint = () => {
+    setGlobalHintEnabled((prev) => {
+      const nextVal = !prev;
+      try {
+        localStorage.setItem(HINT_PREF_KEY, JSON.stringify(nextVal));
+      } catch (e) {
+        console.error('Failed to save hint preference', e);
+      }
+      return nextVal;
+    });
+  };
+
   const handleNext = () => {
     if (currentIndex < activeQuestions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedChoice(null);
       setShowExplanation(false);
-      setShowHint(false);
     }
   };
 
@@ -124,7 +141,6 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
       setCurrentIndex((prev) => prev - 1);
       setSelectedChoice(null);
       setShowExplanation(false);
-      setShowHint(false);
     }
   };
 
@@ -133,7 +149,6 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
     setShowExplanation(true);
 
     const currentQ = activeQuestions[currentIndex];
-    // Automatically scrap when answered incorrectly
     if (currentQ && choiceNum !== currentQ.answer && !scrappedIds.includes(currentQ.id)) {
       toggleScrap(currentQ.id);
     }
@@ -142,7 +157,33 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const handleReset = () => {
     setSelectedChoice(null);
     setShowExplanation(false);
-    setShowHint(false);
+  };
+
+  // Generate question hint safely without spoiling the answer
+  const getQuestionHint = (q: Question) => {
+    const qText = q.question.toLowerCase();
+    if (qText.includes('나선형') || qText.includes('spiral')) {
+      return '나선형(Spiral) 모델의 4대 핵심 활동 중 가장 차별화되는 단계는 위험 분석(Risk Analysis)입니다. 대규모 고위험 프로젝트에 적용됩니다.';
+    }
+    if (qText.includes('폭포수') || qText.includes('waterfall')) {
+      return '폭포수 모델은 순차적·하향식이며 각 단계의 명확한 산출물 승인이 필수적입니다. 요구사항 변경 수용이 어렵습니다.';
+    }
+    if (qText.includes('스크럼') || qText.includes('scrum')) {
+      return '스크럼에서 리뷰(Review)는 제품 시연 및 피드백, 회고(Retrospective)는 팀의 일하는 방식 및 프로세스 개선에 초점을 둡니다.';
+    }
+    if (qText.includes('xp') || qText.includes('익스트림')) {
+      return 'XP의 12대 실천 프랙티스(TDD, Pair Programming, Continuous Integration, Refactoring 등)와 5대 가치(용기, 단순성, 의사소통, 피드백, 존중)를 대조해보세요.';
+    }
+    if (qText.includes('애자일') || qText.includes('agile')) {
+      return '애자일 4대 선언문: 공정/도구보다는 개인과 상호작용, 포괄적 문서보다는 동작하는 소프트웨어, 계약 협상보다는 고객과의 협력, 계획 준수보다는 변화 대응.';
+    }
+    if (qText.includes('단위') || qText.includes('통합') || qText.includes('테스트')) {
+      return '테스트 단계별 목적: 단위(개별 모듈 격리 검증) → 통합(모듈 간 인터페이스/드라이버·스텁) → 시스템(요구사항 적합성) → 인수(사용자 동의).';
+    }
+    if (qText.includes('결합도') || qText.includes('응집도')) {
+      return '결합도(낮을수록 우수: 자-스-제-외-공-내), 응집도(높을수록 우수: 우-논-시-절-통-순-기).';
+    }
+    return `해당 문항은 [${q.ncs_module} 도메인]의 출제 빈출 영역입니다. 선지의 절대적 단어(항상, 오직, 불가능하다)나 선후 관계가 왜곡된 보기를 유의하여 소거법으로 접근해보세요.`;
   };
 
   if (loading) {
@@ -157,33 +198,6 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
     return null;
   }
 
-  // Generate question hint safely without spoiling the answer
-  const getQuestionHint = (q: Question) => {
-    // If explanation has keywords, extract hints or provide domain-specific thinking trigger
-    const qText = q.question.toLowerCase();
-    if (qText.includes('나선형') || qText.includes('spiral')) {
-      return '나선형(Spiral) 모델의 4대 핵심 활동 중 가장 차별화되는 단계는 "위험 분석(Risk Analysis)"입니다. 대규모 고위험 프로젝트에 적용됩니다.';
-    }
-    if (qText.includes('폭포수') || qText.includes('waterfall')) {
-      return '폭포수 모델은 "순차적·하향식"이며 각 단계의 명확한 산출물 승인이 필수적입니다. 요구사항 변경 수용이 매우 어렵습니다.';
-    }
-    if (qText.includes('스크럼') || qText.includes('scrum')) {
-      return '스크럼에서 "리뷰(Review)"는 제품 시연 및 피드백, "회고(Retrospective)"는 팀의 일하는 방식 및 프로세스 개선에 초점을 둡니다.';
-    }
-    if (qText.includes('xp') || qText.includes('익스트림')) {
-      return 'XP의 12대 실천 프랙티스(TDD, Pair Programming, Continuous Integration, Refactoring 등)와 5대 가치(용기, 단순성, 의사소통, 피드백, 존중)를 떠올려보세요.';
-    }
-    if (qText.includes('애자일') || qText.includes('agile')) {
-      return '애자일 4대 선언문: "공정/도구보다는 개인과 상호작용", "포괄적 문서보다는 동작하는 소프트웨어", "계약 협상보다는 고객과의 협력", "계획 준수보다는 변화에 대응"';
-    }
-    if (qText.includes('단위') || qText.includes('통합') || qText.includes('테스트')) {
-      return '테스트 단계별 목적: 단위(개별 모듈 격리 검증) → 통합(모듈 간 인터페이스/드라이버·스텁) → 시스템(요구사항 적합성) → 인수(사용자 동의).';
-    }
-    if (qText.includes('결합도') || qText.includes('응집도')) {
-      return '결합도(낮을수록 우수: 자-스-제-외-공-내), 응집도(높을수록 우수: 우-논-시-절-통-순-기).';
-    }
-    return `해당 문항은 [${q.ncs_module} 도메인]의 출제 빈출 영역입니다. 선지의 절대적 단어('항상', '오직', '불가능하다')나 선후 관계가 왜곡된 보기를 유의하여 소거법으로 접근해보세요.`;
-  };
   const currentQ = activeQuestions[currentIndex];
   const isScrapped = currentQ ? scrappedIds.includes(currentQ.id) : false;
   const isAnswered = selectedChoice !== null;
@@ -196,8 +210,8 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
       {/* Background Accent Glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Controls: Mode Switcher & Counter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      {/* Top Header: Title & Global Control Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 text-xs font-mono font-semibold rounded bg-sky-500/20 text-sky-400 border border-sky-500/30">
@@ -214,8 +228,9 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
           </h3>
         </div>
 
-        {/* Filter Switcher Tabs */}
-        <div className="flex items-center gap-2">
+        {/* Global Controls: Mode Filter & Global Hint Switch */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Mode Tabs */}
           <div className="flex items-center p-1 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-medium">
             <button
               onClick={() => setFilterMode('all')}
@@ -237,16 +252,31 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
               }`}
             >
               <Star className="w-3.5 h-3.5" />
-              <span>스크랩 복습 ({scrappedCountInModule})</span>
+              <span>스크랩 ({scrappedCountInModule})</span>
             </button>
           </div>
 
+          {/* Global Hint Toggle Switch (Consistent SVG Icon, No Emoji) */}
+          <button
+            onClick={toggleGlobalHint}
+            title={globalHintEnabled ? '전체 힌트 끄기' : '전체 힌트 켜기'}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-mono transition-all ${
+              globalHintEnabled
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm font-semibold'
+                : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-slate-200'
+            }`}
+          >
+            <Lightbulb className={`w-3.5 h-3.5 ${globalHintEnabled ? 'text-amber-400 fill-amber-400/20' : ''}`} />
+            <span>힌트 {globalHintEnabled ? 'ON' : 'OFF'}</span>
+          </button>
+
+          {/* Reset Current Card Button */}
           <button
             onClick={handleReset}
             title="다시 풀기"
             className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors border border-slate-800/80"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -319,7 +349,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
 
           {/* Question Card Box */}
           <div className="space-y-5">
-            <div className="text-slate-100 font-medium text-base sm:text-lg leading-relaxed">
+            <div className="text-slate-100 font-medium text-base sm:text-lg leading-relaxed min-h-[4rem]">
               <span className="text-sky-400 font-bold mr-2">Q{currentIndex + 1}.</span>
               {currentQ.question}
             </div>
@@ -364,22 +394,24 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
               })}
             </div>
 
-            {/* Hint Accordion (Placed right below question card before answering) */}
-            <div className="pt-1">
-              <button
-                onClick={() => setShowHint((prev) => !prev)}
-                className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-400 hover:text-amber-300 transition-colors py-1 px-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20"
-              >
-                <Lightbulb className="w-3.5 h-3.5" />
-                <span>{showHint ? '💡 핵심 힌트 닫기' : '💡 막힐 땐? 핵심 힌트 보기'}</span>
-              </button>
-
-              {showHint && (
-                <div className="mt-2 p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs sm:text-sm text-amber-200 leading-relaxed animate-in fade-in slide-in-from-top-1 duration-200">
-                  <div className="flex items-start gap-2">
-                    <span className="font-bold text-amber-400 shrink-0">HINT:</span>
-                    <span>{getQuestionHint(currentQ)}</span>
+            {/* Dedicated Hint Reserve Container (Zero CLS: Pre-allocated height to prevent layout shifts) */}
+            <div className="min-h-[4.25rem] transition-all duration-200">
+              {globalHintEnabled ? (
+                <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs sm:text-sm text-amber-200 leading-relaxed animate-in fade-in duration-200">
+                  <div className="flex items-start gap-2.5">
+                    <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 fill-amber-400/20" />
+                    <div>
+                      <span className="font-mono font-bold text-amber-400 mr-1.5">[HINT]</span>
+                      <span>{getQuestionHint(currentQ)}</span>
+                    </div>
                   </div>
+                </div>
+              ) : (
+                <div className="h-full border border-dashed border-slate-800/50 rounded-xl flex items-center justify-center text-slate-600 text-xs font-mono select-none px-3 py-2.5">
+                  <span className="flex items-center gap-1.5 opacity-60">
+                    <Lightbulb className="w-3.5 h-3.5" />
+                    상단 힌트 토글을 켜면 핵심 단서가 표시됩니다
+                  </span>
                 </div>
               )}
             </div>
