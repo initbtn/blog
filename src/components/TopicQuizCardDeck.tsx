@@ -12,6 +12,7 @@ import {
   BookmarkCheck,
   Star,
   Layers,
+  Lightbulb,
 } from 'lucide-react';
 
 export interface Choice {
@@ -45,6 +46,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const [filterMode, setFilterMode] = useState<'all' | 'scrapped'>('all');
   const [scrappedIds, setScrappedIds] = useState<string[]>([]);
 
@@ -113,6 +115,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
       setCurrentIndex((prev) => prev + 1);
       setSelectedChoice(null);
       setShowExplanation(false);
+      setShowHint(false);
     }
   };
 
@@ -121,6 +124,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
       setCurrentIndex((prev) => prev - 1);
       setSelectedChoice(null);
       setShowExplanation(false);
+      setShowHint(false);
     }
   };
 
@@ -138,6 +142,7 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const handleReset = () => {
     setSelectedChoice(null);
     setShowExplanation(false);
+    setShowHint(false);
   };
 
   if (loading) {
@@ -152,6 +157,33 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
     return null;
   }
 
+  // Generate question hint safely without spoiling the answer
+  const getQuestionHint = (q: Question) => {
+    // If explanation has keywords, extract hints or provide domain-specific thinking trigger
+    const qText = q.question.toLowerCase();
+    if (qText.includes('나선형') || qText.includes('spiral')) {
+      return '나선형(Spiral) 모델의 4대 핵심 활동 중 가장 차별화되는 단계는 "위험 분석(Risk Analysis)"입니다. 대규모 고위험 프로젝트에 적용됩니다.';
+    }
+    if (qText.includes('폭포수') || qText.includes('waterfall')) {
+      return '폭포수 모델은 "순차적·하향식"이며 각 단계의 명확한 산출물 승인이 필수적입니다. 요구사항 변경 수용이 매우 어렵습니다.';
+    }
+    if (qText.includes('스크럼') || qText.includes('scrum')) {
+      return '스크럼에서 "리뷰(Review)"는 제품 시연 및 피드백, "회고(Retrospective)"는 팀의 일하는 방식 및 프로세스 개선에 초점을 둡니다.';
+    }
+    if (qText.includes('xp') || qText.includes('익스트림')) {
+      return 'XP의 12대 실천 프랙티스(TDD, Pair Programming, Continuous Integration, Refactoring 등)와 5대 가치(용기, 단순성, 의사소통, 피드백, 존중)를 떠올려보세요.';
+    }
+    if (qText.includes('애자일') || qText.includes('agile')) {
+      return '애자일 4대 선언문: "공정/도구보다는 개인과 상호작용", "포괄적 문서보다는 동작하는 소프트웨어", "계약 협상보다는 고객과의 협력", "계획 준수보다는 변화에 대응"';
+    }
+    if (qText.includes('단위') || qText.includes('통합') || qText.includes('테스트')) {
+      return '테스트 단계별 목적: 단위(개별 모듈 격리 검증) → 통합(모듈 간 인터페이스/드라이버·스텁) → 시스템(요구사항 적합성) → 인수(사용자 동의).';
+    }
+    if (qText.includes('결합도') || qText.includes('응집도')) {
+      return '결합도(낮을수록 우수: 자-스-제-외-공-내), 응집도(높을수록 우수: 우-논-시-절-통-순-기).';
+    }
+    return `해당 문항은 [${q.ncs_module} 도메인]의 출제 빈출 영역입니다. 선지의 절대적 단어('항상', '오직', '불가능하다')나 선후 관계가 왜곡된 보기를 유의하여 소거법으로 접근해보세요.`;
+  };
   const currentQ = activeQuestions[currentIndex];
   const isScrapped = currentQ ? scrappedIds.includes(currentQ.id) : false;
   const isAnswered = selectedChoice !== null;
@@ -330,6 +362,26 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
                   </button>
                 );
               })}
+            </div>
+
+            {/* Hint Accordion (Placed right below question card before answering) */}
+            <div className="pt-1">
+              <button
+                onClick={() => setShowHint((prev) => !prev)}
+                className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-400 hover:text-amber-300 transition-colors py-1 px-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20"
+              >
+                <Lightbulb className="w-3.5 h-3.5" />
+                <span>{showHint ? '💡 핵심 힌트 닫기' : '💡 막힐 땐? 핵심 힌트 보기'}</span>
+              </button>
+
+              {showHint && (
+                <div className="mt-2 p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs sm:text-sm text-amber-200 leading-relaxed animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-amber-400 shrink-0">HINT:</span>
+                    <span>{getQuestionHint(currentQ)}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
