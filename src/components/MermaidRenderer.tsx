@@ -21,6 +21,10 @@ export function MermaidRenderer() {
             theme: 'dark',
             securityLevel: 'loose',
             fontFamily: 'inherit',
+            flowchart: {
+              htmlLabels: true,
+              useMaxWidth: true,
+            },
             themeVariables: {
               darkMode: true,
               background: '#0b1120',
