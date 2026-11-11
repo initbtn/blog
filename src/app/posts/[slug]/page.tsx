@@ -4,6 +4,8 @@ import type { Metadata } from 'next';
 import { getAllPosts, getPostBySlug } from '../../../lib/posts';
 import { MermaidRenderer } from '../../../components/MermaidRenderer';
 import { TopicQuizCardDeck } from '../../../components/TopicQuizCardDeck';
+import { RelatedPosts } from '../../../components/RelatedPosts';
+import { TopicFrequencyBadge } from '../../../components/TopicFrequencyBadge';
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -116,13 +118,16 @@ export default async function PostPage({ params }: PostPageProps) {
 
       {/* Header Container */}
       <header className="glass-panel rounded-2xl p-6 sm:p-8 space-y-4">
-        <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-400">
-          <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
-            ENGINEERING ESSAY
-          </span>
-          <time dateTime={post.date}>{post.date}</time>
-          <span>•</span>
-          <span className="text-amber-400 font-semibold">{post.readingTime}</span>
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
+          <div className="flex items-center gap-3">
+            <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+              ENGINEERING ESSAY
+            </span>
+            <time dateTime={post.date}>{post.date}</time>
+            <span>•</span>
+            <span className="text-amber-400 font-semibold">{post.readingTime}</span>
+          </div>
+          <TopicFrequencyBadge slug={slug} />
         </div>
 
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
@@ -163,6 +168,13 @@ export default async function PostPage({ params }: PostPageProps) {
           moduleTitle={post.title}
         />
       )}
+
+      {/* Related Posts Recommendation */}
+      <RelatedPosts
+        currentSlug={slug}
+        currentTags={post.tags || []}
+        allPosts={getAllPosts()}
+      />
 
       {/* Post Footer */}
       <footer className="glass-panel rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">

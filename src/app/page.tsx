@@ -1,5 +1,6 @@
 import { getAllPosts, getAllTags } from '../lib/posts';
 import { PostCard } from '../components/PostCard';
+import { ArticleExplorer } from '../components/ArticleExplorer';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -111,19 +112,16 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Regular Articles Section (if more exist) */}
-      {regularPosts.length > 0 && (
-        <section className="space-y-4">
+      {/* Regular Articles Section / Article Explorer */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
           <h2 className="text-xs font-mono uppercase tracking-widest text-slate-400 font-semibold">
-            전체 아카이브
+            아티클 탐색기
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {regularPosts.map((post) => (
-              <PostCard key={post.slug} post={post} />
-            ))}
-          </div>
-        </section>
-      )}
+          <span className="text-xs font-mono text-slate-500">총 {posts.length}편</span>
+        </div>
+        <ArticleExplorer posts={posts} />
+      </section>
 
       {/* Engineering Ecosystem Card */}
       <section className="glass-panel rounded-2xl p-6 sm:p-8 space-y-4 border border-slate-800/80">
