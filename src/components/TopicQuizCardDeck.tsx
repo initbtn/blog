@@ -44,6 +44,13 @@ interface TopicQuizCardDeckProps {
 
 const STORAGE_KEY = 'ncs_scrapped_questions_v1';
 const HINT_PREF_KEY = 'ncs_global_hint_enabled_v1';
+const ANSWERS_STORAGE_KEY = 'ncs_quiz_answers_v1';
+
+interface QuizAnswerRecord {
+  selectedChoice: number;
+  isCorrect: boolean;
+  solvedAt: number;
+}
 
 export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: TopicQuizCardDeckProps) {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
@@ -54,6 +61,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
   const [globalHintEnabled, setGlobalHintEnabled] = useState(false);
   const [filterMode, setFilterMode] = useState<'subtopic' | 'all' | 'scrapped'>('subtopic');
   const [scrappedIds, setScrappedIds] = useState<string[]>([]);
+  const [answersHistory, setAnswersHistory] = useState<Record<string, QuizAnswerRecord>>({});
   const [isJumpInputOpen, setIsJumpInputOpen] = useState(false);
   const [jumpInputValue, setJumpInputValue] = useState('');
   const jumpInputRef = useRef<HTMLInputElement>(null);
@@ -72,6 +80,10 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
       const savedHint = localStorage.getItem(HINT_PREF_KEY);
       if (savedHint !== null) {
         setGlobalHintEnabled(JSON.parse(savedHint));
+      }
+      const savedAnswers = localStorage.getItem(ANSWERS_STORAGE_KEY);
+      if (savedAnswers) {
+        setAnswersHistory(JSON.parse(savedAnswers));
       }
     } catch (e) {
       console.error('Failed to load preferences from storage', e);
@@ -115,11 +127,22 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
     return allQuestions;
   }, [allQuestions, filterMode, subTopicCode, scrappedIds]);
 
+  // Sync current question's saved answer from answersHistory
+  useEffect(() => {
+    const currentQ = activeQuestions[currentIndex];
+    if (currentQ && answersHistory[currentQ.id]) {
+      const record = answersHistory[currentQ.id];
+      setSelectedChoice(record.selectedChoice);
+      setShowExplanation(true);
+    } else {
+      setSelectedChoice(null);
+      setShowExplanation(false);
+    }
+  }, [currentIndex, activeQuestions, answersHistory]);
+
   // Reset index when filter changes
   useEffect(() => {
     setCurrentIndex(0);
-    setSelectedChoice(null);
-    setShowExplanation(false);
   }, [filterMode, activeQuestions.length]);
 
   // Toggle Scrap
@@ -150,16 +173,12 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
   const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
-      setSelectedChoice(null);
-      setShowExplanation(false);
     }
   };
 
   const handleNext = () => {
     if (currentIndex < activeQuestions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
-      setSelectedChoice(null);
-      setShowExplanation(false);
     }
   };
 
@@ -177,8 +196,6 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
     const targetNum = parseInt(jumpInputValue.trim(), 10);
     if (!isNaN(targetNum) && targetNum >= 1 && targetNum <= activeQuestions.length) {
       setCurrentIndex(targetNum - 1);
-      setSelectedChoice(null);
-      setShowExplanation(false);
     }
     setIsJumpInputOpen(false);
   };
@@ -220,16 +237,56 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
 
   const handleChoiceSelect = (choiceNumber: number) => {
     if (selectedChoice !== null) return; // Prevent changing after selection
+    const currentQ = activeQuestions[currentIndex];
+    if (!currentQ) return;
+
+    const isAnsCorrect = choiceNumber === currentQ.answer;
     setSelectedChoice(choiceNumber);
     setShowExplanation(true);
 
+    // Save answer to history & localStorage
+    const newRecord: QuizAnswerRecord = {
+      selectedChoice: choiceNumber,
+      isCorrect: isAnsCorrect,
+      solvedAt: Date.now(),
+    };
+
+    setAnswersHistory((prev) => {
+      const updated = { ...prev, [currentQ.id]: newRecord };
+      try {
+        localStorage.setItem(ANSWERS_STORAGE_KEY, JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to save quiz answer record', e);
+      }
+      return updated;
+    });
+
     // Auto-scrap wrong answers
-    const currentQ = activeQuestions[currentIndex];
-    if (currentQ && choiceNumber !== currentQ.answer) {
+    if (!isAnsCorrect) {
       if (!scrappedIds.includes(currentQ.id)) {
         toggleScrap(currentQ.id);
       }
     }
+  };
+
+  // Reset answer for current question to retry
+  const handleResetCurrentAnswer = () => {
+    const currentQ = activeQuestions[currentIndex];
+    if (!currentQ) return;
+
+    setSelectedChoice(null);
+    setShowExplanation(false);
+
+    setAnswersHistory((prev) => {
+      const updated = { ...prev };
+      delete updated[currentQ.id];
+      try {
+        localStorage.setItem(ANSWERS_STORAGE_KEY, JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to update answers history on reset', e);
+      }
+      return updated;
+    });
   };
 
   // Generate question hint safely without spoiling the answer
@@ -396,6 +453,18 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
               className={`w-3.5 h-3.5 ${globalHintEnabled ? 'text-amber-400 fill-amber-400/20' : ''}`}
             />
           </button>
+
+          {/* Retry Current Question Button */}
+          {selectedChoice !== null && (
+            <button
+              onClick={handleResetCurrentAnswer}
+              title="현재 문항 다시 풀기 (답안 초기화)"
+              className="p-1.5 rounded-lg border bg-slate-900/80 text-slate-400 border-slate-800 hover:text-sky-300 hover:border-sky-500/40 transition-all flex items-center gap-1 text-[11px] font-mono"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">다시풀기</span>
+            </button>
+          )}
         </div>
       </div>
 
