@@ -100,7 +100,5 @@ draft: false
 
 개념을 입체적으로 다지고 머릿속에 구조를 각인할 수 있는 수험생 추천 명강의입니다:
 
-- **[흥달쌤 유튜브]** 정보처리기사 필기/실기 소프트웨어 생명주기 모형 특강  
-  👉 [흥달쌤 채널 바로가기 (@HeungSsaem)](https://www.youtube.com/@HeungSsaem)
 - **[길벗 시나공]** 소프트웨어 개발 생명주기(SDLC) 핵심 개념 요약  
   👉 [시나공 IT 소프트웨어 공학 플레이리스트](https://www.youtube.com/results?search_query=%EC%8B%9C%EB%82%98%EA%B3%B5+%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4+%EC%83%9D%EB%AA%85%EC%A3%BC%EA%B8%B0)

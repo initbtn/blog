@@ -133,11 +133,10 @@ draft: false
 
 ---
 
-## 7. 추천 무료 핵심 특강 (YouTube)
+## 7. 공식 표준 및 참조 가이드
 
-- **[흥달쌤] 정보처리기사 소프트웨어공학 - 애자일 & 소프트웨어 생명주기 완벽 정리**:
-  - [유튜브 흥달쌤 채널 바로가기](https://www.youtube.com/@HeungSsaem)
-  - 핵심 키워드: 애자일 4대 선언 도치 함정, 스크럼 5대 이벤트, XP 12대 프랙티스 실전 암기팁 수록.
 - **공식 표준 참조처**:
-  - [Agile Alliance 애자일 선언문 원문](https://www.agilealliance.org/agile101/the-agile-manifesto/)
+  - [Agile Alliance 애자일 선언문 원문 (한국어판)](https://agilemanifesto.org/iso/ko/manifesto.html)
   - [Scrum.org 공식 스크럼 가이드라인](https://scrumguides.org/)
+  - [IT위키 스크럼 (Scrum)](https://itwiki.kr/w/%EC%8A%A4%ED%81%AC%EB%9F%BC)
+  - [IT위키 익스트림 프로그래밍 (XP)](https://itwiki.kr/w/XP)

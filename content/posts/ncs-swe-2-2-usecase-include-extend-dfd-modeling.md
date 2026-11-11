@@ -115,7 +115,5 @@ draft: false
 
 ## 6. 추천 무료 특강 (YouTube)
 
-- **[흥달쌤 유튜브]** 정보처리기사 필기/실기 유스케이스 다이어그램 & DFD 핵심 특강  
-  👉 [흥달쌤 채널 바로가기 (@HeungSsaem)](https://www.youtube.com/@HeungSsaem)
 - **[길벗 시나공]** 소프트웨어 분석 모델링: DFD와 자료사전 기호 완전 정복  
   👉 [시나공 IT 요구사항 분석 모델링 플레이리스트](https://www.youtube.com/results?search_query=%EC%8B%9C%EB%82%98%EA%B3%B5+%EC%9E%90%EB%A3%8C%ED%9D%90%EB%A6%84%EB%8F%84+DFD)

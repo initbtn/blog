@@ -110,7 +110,5 @@ draft: false
 
 개념을 탄탄히 다지고 실전 감각을 높일 수 있는 수험생 추천 명강의입니다:
 
-- **[흥달쌤 유튜브]** 정보처리기사 필기/실기 요구사항 확인 & 기능/비기능 명세 특강  
-  👉 [흥달쌤 채널 바로가기 (@HeungSsaem)](https://www.youtube.com/@HeungSsaem)
 - **[길벗 시나공]** 소프트웨어 요구공학 프로세스 및 SRS 품질 요건 정리  
   👉 [시나공 IT 요구사항 확인 플레이리스트](https://www.youtube.com/results?search_query=%EC%8B%9C%EB%82%98%EA%B3%B5+%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD+%ED%99%95%EC%9D%B8)
