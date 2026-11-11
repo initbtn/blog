@@ -17,7 +17,7 @@ flowchart TD
     
     W["1. 폭포수 (Waterfall)<br>- 순차적 하향식 접근<br>- 요구사항 동결 전제"]
     S["2. 나선형 (Spiral)<br>- 위험 분석(Risk Analysis) 중심<br>- 점증적 반복 프로토타이핑"]
-    U["3. 통합 프로세스 (UP/RUP)<br>- 도입 $\rightarrow$ 상세 $\rightarrow$ 구축 $\rightarrow$ 이행<br>- 아키텍처 조기 확정"]
+    U["3. 통합 프로세스 (UP/RUP)<br>- 도입 → 상세 → 구축 → 이행<br>- 아키텍처 조기 확정"]
 
     SDLC --> W
     SDLC --> S
@@ -30,9 +30,9 @@ flowchart TD
 
 | 모델 | 핵심 메커니즘 | 단계별 프로세스 | 가장 빈출되는 시험 오답 함정 |
 | :--- | :--- | :--- | :--- |
-| **폭포수<br>(Waterfall)** | 고전적 순차 모델 (선행 단계 승인 후 다음 단계 진입) | 타당성검토 $\rightarrow$ 계획 $\rightarrow$ 요구분석 $\rightarrow$ 설계 $\rightarrow$ 구현 $\rightarrow$ 시험 $\rightarrow$ 유지보수 | *"사용자의 요구사항 변경에 유연하게 대응할 수 있다"* (X $\rightarrow$ 변경 수용 불가, 피드백 지연) |
-| **나선형<br>(Spiral)** | 보헴(Boehm) 제안, **위험(Risk) 최소화** 목적 | **계획 수립 $\rightarrow$ 위험 분석 $\rightarrow$ 공학 개발 $\rightarrow$ 고객 평가** | *"위험 분석 단계 없이 시제품을 바로 배포한다"* (X) / 4단계 순서를 거꾸로 섞음 |
-| **통합 프로세스<br>(UP/RUP)** | 유스케이스 기반, **아키텍처 중심**, 반복·점증 | **도입(Inception) $\rightarrow$ 상세(Elaboration) $\rightarrow$ 구축(Construction) $\rightarrow$ 이행(Transition)** | 상세 단계(Elaboration)에서 비즈니스 모델만 수립하고 아키텍처를 뒤로 미룬다고 왜곡 (X) |
+| **폭포수<br>(Waterfall)** | 고전적 순차 모델 (선행 단계 승인 후 다음 단계 진입) | 타당성검토 → 계획 → 요구분석 → 설계 → 구현 → 시험 → 유지보수 | *"사용자의 요구사항 변경에 유연하게 대응할 수 있다"* (X → 변경 수용 불가, 피드백 지연) |
+| **나선형<br>(Spiral)** | 보헴(Boehm) 제안, **위험(Risk) 최소화** 목적 | **계획 수립 → 위험 분석 → 공학 개발 → 고객 평가** | *"위험 분석 단계 없이 시제품을 바로 배포한다"* (X) / 4단계 순서를 거꾸로 섞음 |
+| **통합 프로세스<br>(UP/RUP)** | 유스케이스 기반, **아키텍처 중심**, 반복·점증 | **도입(Inception) → 상세(Elaboration) → 구축(Construction) → 이행(Transition)** | 상세 단계(Elaboration)에서 비즈니스 모델만 수립하고 아키텍처를 뒤로 미룬다고 왜곡 (X) |
 
 ---
 
@@ -49,9 +49,9 @@ flowchart TD
 
 ### Q2. 나선형 모델 4단계 순서형 (정보처리기사)
 > **Q. 보헴이 제안한 나선형 모델(Spiral Model)의 프로젝트 수행 순서로 옳은 것은?**  
-> ① 계획 수립 $\rightarrow$ 위험 분석 $\rightarrow$ 개발 및 검증 $\rightarrow$ 고객 평가  
-> ② 위험 분석 $\rightarrow$ 계획 수립 $\rightarrow$ 고객 평가 $\rightarrow$ 개발 및 검증  
-> ③ 계획 수립 $\rightarrow$ 개발 및 검증 $\rightarrow$ 위험 분석 $\rightarrow$ 고객 평가  
-> ④ 고객 평가 $\rightarrow$ 계획 수립 $\rightarrow$ 위험 분석 $\rightarrow$ 개발 및 검증  
+> ① 계획 수립 → 위험 분석 → 개발 및 검증 → 고객 평가  
+> ② 위험 분석 → 계획 수립 → 고객 평가 → 개발 및 검증  
+> ③ 계획 수립 → 개발 및 검증 → 위험 분석 → 고객 평가  
+> ④ 고객 평가 → 계획 수립 → 위험 분석 → 개발 및 검증  
 > **공인 정답: ①**  
-> **해설**: 나선 회전마다 먼저 목표와 제약조건을 세우는 **계획 수립** $\rightarrow$ 대안을 식별하고 기술적 위험을 해소하는 **위험 분석** $\rightarrow$ 시제품 제작 및 **공학 개발** $\rightarrow$ 결과를 검토하는 **고객 평가** 순서로 진행됩니다.
+> **해설**: 나선 회전마다 먼저 목표와 제약조건을 세우는 **계획 수립** → 대안을 식별하고 기술적 위험을 해소하는 **위험 분석** → 시제품 제작 및 **공학 개발** → 결과를 검토하는 **고객 평가** 순서로 진행됩니다.

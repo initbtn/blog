@@ -27,7 +27,7 @@ flowchart TD
 ## 2. 유형 1: 결합도 6단계 & 응집도 7단계 초고속 판별법
 
 ### 2.1 결합도 (Coupling): 낮을수록 우수 (독립성 증가)
-암기 공식: **"자 $\rightarrow$ 스 $\rightarrow$ 제 $\rightarrow$ 외 $\rightarrow$ 공 $\rightarrow$ 내"**
+암기 공식: **"자 → 스 → 제 → 외 → 공 → 내"**
 
 | 순위 | 결합도 명칭 | 데이터 전달 방식 | 판별 특징 |
 | :---: | :--- | :--- | :--- |
@@ -39,7 +39,7 @@ flowchart TD
 | 6 (최악) | **내용 (Content)** | 다른 모듈의 내부 코드, 라벨, 분기문 직접 참조 | 한 모듈의 코드를 다른 모듈에서 직접 점프하여 실행 |
 
 ### 2.2 응집도 (Cohesion): 높을수록 우수 (품질 증가)
-암기 공식: **"우 $\rightarrow$ 논 $\rightarrow$ 시 $\rightarrow$ 절 $\rightarrow$ 교 $\rightarrow$ 순 $\rightarrow$ 기"** (우논시절교순기)
+암기 공식: **"우 → 논 → 시 → 절 → 교 → 순 → 기"** (우논시절교순기)
 - **기능적 (Functional) [최우수]**: 단 하나의 단일 목적만 완벽하게 수행 (예: `Math.sin(x)`).
 - **순차적 (Sequential)**: A 요소의 출력이 B 요소의 입력으로 직접 이어짐.
 - **교환적 (Communication)**: 동일한 입력 데이터를 사용하여 서로 다른 연산을 수행.
@@ -85,8 +85,8 @@ flowchart TD
 
 ### Q2. 결합도 순서 배열형 (2020 국가직 7급)
 > **Q. 소프트웨어 설계 시 결합도가 낮은(우수한) 것부터 순서대로 바르게 나열한 것은?**  
-> ① 자료 $\rightarrow$ 스탬프 $\rightarrow$ 제어 $\rightarrow$ 외부 $\rightarrow$ 공통 $\rightarrow$ 내용  
-> ② 내용 $\rightarrow$ 공통 $\rightarrow$ 외부 $\rightarrow$ 제어 $\rightarrow$ 스탬프 $\rightarrow$ 자료  
-> ③ 자료 $\rightarrow$ 제어 $\rightarrow$ 스탬프 $\rightarrow$ 공통 $\rightarrow$ 외부 $\rightarrow$ 내용  
-> ④ 내용 $\rightarrow$ 외부 $\rightarrow$ 공통 $\rightarrow$ 제어 $\rightarrow$ 스탬프 $\rightarrow$ 자료  
+> ① 자료 → 스탬프 → 제어 → 외부 → 공통 → 내용  
+> ② 내용 → 공통 → 외부 → 제어 → 스탬프 → 자료  
+> ③ 자료 → 제어 → 스탬프 → 공통 → 외부 → 내용  
+> ④ 내용 → 외부 → 공통 → 제어 → 스탬프 → 자료  
 > **정답: ①** ('자스제외공내' 암기 공식으로 3초 만에 해결)

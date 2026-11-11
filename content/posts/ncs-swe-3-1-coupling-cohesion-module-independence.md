@@ -26,7 +26,7 @@ flowchart LR
 
 ---
 
-## 2. 결합도 6단계 암기 공식: "자 - 스 - 제 - 외 - 공 - 내" (약함 $\rightarrow$ 강함)
+## 2. 결합도 6단계 암기 공식: "자 - 스 - 제 - 외 - 공 - 내" (약함 → 강함)
 
 | 순위 | 결합도 명칭 | 데이터 교환 방식 | 기출 판별 시그니처 |
 | :---: | :--- | :--- | :--- |
@@ -39,7 +39,7 @@ flowchart LR
 
 ---
 
-## 3. 응집도 7단계 암기 공식: "우 - 논 - 시 - 절 - 교 - 순 - 기" (약함 $\rightarrow$ 강함)
+## 3. 응집도 7단계 암기 공식: "우 - 논 - 시 - 절 - 교 - 순 - 기" (약함 → 강함)
 
 - **기능적 (Functional) [최우수]**: 모듈 내 모든 요소가 **오직 하나의 단일 목적**만을 수행 (`Math.sqrt()`).
 - **순차적 (Sequential)**: 한 요소의 **출력 데이터가 다음 요소의 입력 데이터**로 직결됨.
@@ -74,8 +74,8 @@ flowchart LR
 
 ### Q2. 결합도 순서 배열형 (2020 국가직 7급)
 > **Q. 소프트웨어 설계 시 결합도가 낮은(우수한) 것부터 순서대로 바르게 나열한 것은?**  
-> ① 자료 $\rightarrow$ 스탬프 $\rightarrow$ 제어 $\rightarrow$ 외부 $\rightarrow$ 공통 $\rightarrow$ 내용  
-> ② 내용 $\rightarrow$ 공통 $\rightarrow$ 외부 $\rightarrow$ 제어 $\rightarrow$ 스탬프 $\rightarrow$ 자료  
-> ③ 자료 $\rightarrow$ 제어 $\rightarrow$ 스탬프 $\rightarrow$ 공통 $\rightarrow$ 외부 $\rightarrow$ 내용  
-> ④ 내용 $\rightarrow$ 외부 $\rightarrow$ 공통 $\rightarrow$ 제어 $\rightarrow$ 스탬프 $\rightarrow$ 자료  
+> ① 자료 → 스탬프 → 제어 → 외부 → 공통 → 내용  
+> ② 내용 → 공통 → 외부 → 제어 → 스탬프 → 자료  
+> ③ 자료 → 제어 → 스탬프 → 공통 → 외부 → 내용  
+> ④ 내용 → 외부 → 공통 → 제어 → 스탬프 → 자료  
 > **공인 정답: ①** ('자스제외공내' 암기 공식으로 3초 만에 득점)

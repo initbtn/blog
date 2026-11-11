@@ -73,11 +73,11 @@ flowchart LR
 > 
 > **[초정밀 풀이 과정]**:  
 > 1. 시작 작업: D(5일), E(10일)
-> 2. 작업 A: 선행 D(5) $\rightarrow$ A 완료 = $5 + 15 = \mathbf{20\text{일}}$
-> 3. 작업 C: 선행 E(10) $\rightarrow$ C 완료 = $10 + 15 = \mathbf{25\text{일}}$
-> 4. 작업 B: 선행 A(20), D(5), E(10) $\rightarrow \max(20, 5, 10) = 20\text{일}$에 시작! $\rightarrow$ B 완료 = $20 + 10 = \mathbf{30\text{일}}$
-> 5. 작업 F: 선행 A(20), B(30) $\rightarrow \max(20, 30) = 30\text{일}$에 시작! $\rightarrow$ F 완료 = $30 + 20 = \mathbf{50\text{일}}$
-> 6. 작업 G: 선행 B(30), C(25) $\rightarrow \max(30, 25) = 30\text{일}$에 시작! $\rightarrow$ G 완료 = $30 + 15 = \mathbf{45\text{일}}$
+> 2. 작업 A: 선행 D(5) → A 완료 = $5 + 15 = \mathbf{20\text{일}}$
+> 3. 작업 C: 선행 E(10) → C 완료 = $10 + 15 = \mathbf{25\text{일}}$
+> 4. 작업 B: 선행 A(20), D(5), E(10) → $\max(20, 5, 10) = 20\text{일}$에 시작! → B 완료 = $20 + 10 = \mathbf{30\text{일}}$
+> 5. 작업 F: 선행 A(20), B(30) → $\max(20, 30) = 30\text{일}$에 시작! → F 완료 = $30 + 20 = \mathbf{50\text{일}}$
+> 6. 작업 G: 선행 B(30), C(25) → $\max(30, 25) = 30\text{일}$에 시작! → G 완료 = $30 + 15 = \mathbf{45\text{일}}$
 > 7. 전체 완료일: $\max(\text{F 완료: 50}, \text{G 완료: 45}) = \mathbf{50\text{일}}$!
 
 ### Q2. 임계경로 개념 진위 판별형 (정보처리기사)
