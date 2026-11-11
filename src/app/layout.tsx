@@ -5,6 +5,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { MobileBottomNav } from '../components/MobileBottomNav';
 import { FloatingChatBot } from '../components/FloatingChatBot';
+import { ThemeProvider } from '../components/ThemeProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -87,6 +88,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
@@ -95,15 +97,22 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#090d16] text-slate-100 bg-grid-pattern relative">
-        <div className="absolute top-0 left-0 right-0 h-96 bg-radial-glow pointer-events-none" />
-        <Header />
-        <main className="flex-1 max-w-4xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-10 pb-28 md:pb-12 relative z-10">
-          {children}
-        </main>
-        <Footer />
-        <MobileBottomNav />
-        <FloatingChatBot />
+      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] bg-grid-pattern relative transition-colors duration-200">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="absolute top-0 left-0 right-0 h-96 bg-radial-glow pointer-events-none" />
+          <Header />
+          <main className="flex-1 max-w-4xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-10 pb-28 md:pb-12 relative z-10">
+            {children}
+          </main>
+          <Footer />
+          <MobileBottomNav />
+          <FloatingChatBot />
+        </ThemeProvider>
       </body>
     </html>
   );

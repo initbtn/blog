@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Mail, Check, Share2, Copy, CheckCheck, Loader2, X, Bell } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 export function HeaderActions() {
   const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
@@ -70,6 +71,9 @@ export function HeaderActions() {
 
   return (
     <div className="relative flex items-center gap-1.5 sm:gap-2">
+      {/* ── 0. 테마 토글 (기존 아이콘셋 Sun/Moon) ── */}
+      <ThemeToggle />
+
       {/* ── 1. 구독하기 버튼 ── */}
       <button
         onClick={() => {
