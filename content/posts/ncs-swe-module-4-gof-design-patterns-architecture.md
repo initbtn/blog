@@ -77,7 +77,7 @@ flowchart TD
 > 1. 생성 패턴(추빌팩프싱 찾기): Abstract Factory, Builder, Prototype, Singleton = **4개**  
 > 2. 구조 패턴(어브컴데파플프 찾기): Adapter, Bridge, Composite, Decorator, Proxy = **5개**  
 > 3. 행위 패턴: Iterator, Mediator, Observer, Strategy, Visitor = **5개**  
-> $\rightarrow$ **(4, 5, 5)** 도출 완료!
+> → **(4, 5, 5)** 도출 완료!
 
 ### Q2. 행위 패턴 판별형 (정보처리기사)
 > **Q. GoF 디자인 패턴 중 행위(Behavioral) 패턴에 속하는 것은?**  
