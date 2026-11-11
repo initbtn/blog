@@ -51,6 +51,9 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const [globalHintEnabled, setGlobalHintEnabled] = useState(false);
   const [filterMode, setFilterMode] = useState<'all' | 'scrapped'>('all');
   const [scrappedIds, setScrappedIds] = useState<string[]>([]);
+  const [isJumpInputOpen, setIsJumpInputOpen] = useState(false);
+  const [jumpInputValue, setJumpInputValue] = useState('');
+  const jumpInputRef = useRef<HTMLInputElement>(null);
 
   // Touch Swipe Gesture State
   const touchStartXRef = useRef<number | null>(null);
@@ -202,6 +205,29 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
   const handleReset = () => {
     setSelectedChoice(null);
     setShowExplanation(false);
+  };
+
+  // Jump to specific question number
+  const handleOpenJump = () => {
+    setJumpInputValue(String(currentIndex + 1));
+    setIsJumpInputOpen(true);
+    setTimeout(() => {
+      jumpInputRef.current?.focus();
+      jumpInputRef.current?.select();
+    }, 50);
+  };
+
+  const handleJumpSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetNum = parseInt(jumpInputValue.trim(), 10);
+    if (!isNaN(targetNum) && targetNum >= 1 && targetNum <= activeQuestions.length) {
+      setCurrentIndex(targetNum - 1);
+      setSelectedChoice(null);
+      setShowExplanation(false);
+      setIsJumpInputOpen(false);
+    } else {
+      setIsJumpInputOpen(false);
+    }
   };
 
   // Generate question hint safely without spoiling the answer
@@ -368,12 +394,37 @@ export function TopicQuizCardDeck({ moduleCode, moduleTitle }: TopicQuizCardDeck
       ) : (
         <>
           {/* Progress Bar & Inline Stepper Icons Header */}
-          <div className="flex items-center justify-between gap-3 text-xs font-mono text-slate-400">
-            {/* Left: Current Progress & Progress Bar */}
-            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-              <span className="text-sky-400 font-bold shrink-0 text-xs">
-                {currentIndex + 1} / {activeQuestions.length}
-              </span>
+          <div className="flex items-center justify-between gap-2.5 text-xs font-mono text-slate-400">
+            {/* Left: Interactive Question Number Jump & Progress Bar */}
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              {isJumpInputOpen ? (
+                <form onSubmit={handleJumpSubmit} className="flex items-center gap-1 shrink-0">
+                  <input
+                    ref={jumpInputRef}
+                    type="number"
+                    min={1}
+                    max={activeQuestions.length}
+                    value={jumpInputValue}
+                    onChange={(e) => setJumpInputValue(e.target.value)}
+                    onBlur={() => setIsJumpInputOpen(false)}
+                    className="w-14 px-1.5 py-0.5 text-center text-xs font-bold text-sky-400 bg-slate-900 border border-sky-500 rounded focus:outline-none focus:ring-1 focus:ring-sky-400"
+                  />
+                  <span className="text-slate-500 text-[11px]">/ {activeQuestions.length}</span>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleOpenJump}
+                  title="클릭하여 문항 번호 직접 입력 이동"
+                  className="group flex items-center gap-1 shrink-0 px-2 py-0.5 -ml-1 rounded hover:bg-slate-800/80 transition-colors cursor-pointer"
+                >
+                  <span className="text-sky-400 font-bold group-hover:underline">
+                    {currentIndex + 1}
+                  </span>
+                  <span className="text-slate-500 text-[11px]">/ {activeQuestions.length}</span>
+                </button>
+              )}
+
               <div className="w-full bg-slate-800/80 rounded-full h-1 overflow-hidden">
                 <div
                   className={`h-1 transition-all duration-300 ${
