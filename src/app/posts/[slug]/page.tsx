@@ -113,7 +113,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center text-xs font-mono text-slate-400 hover:text-sky-400 transition-colors group"
+          className="inline-flex items-center text-xs font-mono text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors group"
         >
           <span className="mr-1.5 group-hover:-translate-x-1 transition-transform">←</span>
           <span>목록으로 돌아가기</span>
@@ -122,32 +122,32 @@ export default async function PostPage({ params }: PostPageProps) {
 
       {/* Header Container */}
       <header className="glass-panel rounded-2xl p-6 sm:p-8 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-3">
-            <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+            <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 font-semibold">
               ENGINEERING ESSAY
             </span>
             <time dateTime={post.date}>{post.date}</time>
             <span>•</span>
-            <span className="text-amber-400 font-semibold">{post.readingTime}</span>
+            <span className="text-amber-600 dark:text-amber-400 font-semibold">{post.readingTime}</span>
           </div>
           <TopicFrequencyBadge slug={slug} />
         </div>
 
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
           {post.title}
         </h1>
 
-        <p className="text-sm sm:text-base text-slate-300 leading-relaxed pt-1">
+        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed pt-1">
           {post.summary}
         </p>
 
         {post.tags && post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-800">
+          <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2.5 py-0.5 text-xs font-mono rounded bg-slate-800/80 border border-slate-700/60 text-slate-300"
+                className="px-2.5 py-0.5 text-xs font-mono rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-slate-600 dark:text-slate-300"
               >
                 #{tag}
               </span>

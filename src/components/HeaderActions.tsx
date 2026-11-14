@@ -91,18 +91,18 @@ export function HeaderActions() {
       {/* ── 2. 공유하기 버튼 ── */}
       <button
         onClick={handleShare}
-        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-slate-200 hover:border-sky-500/60 hover:text-sky-300 transition-colors text-xs font-medium"
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:border-sky-500/60 hover:text-sky-600 dark:hover:text-sky-300 transition-colors text-xs font-medium"
         title="현재 페이지 공유/링크 복사"
         aria-label="공유하기"
       >
         {copied ? (
           <>
-            <CheckCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-emerald-400 font-mono text-[11px]">복사됨!</span>
+            <CheckCheck className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+            <span className="text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">복사됨!</span>
           </>
         ) : (
           <>
-            <Share2 className="w-3.5 h-3.5 text-sky-400" />
+            <Share2 className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400" />
             <span className="hidden sm:inline">공유</span>
           </>
         )}
@@ -111,21 +111,21 @@ export function HeaderActions() {
       {/* ── 구독 팝업 모달 (Popover) ── */}
       {isSubscribeOpen && (
         <div className="absolute right-0 top-12 z-50 w-80 sm:w-88 p-4 rounded-2xl glass-panel border border-amber-500/40 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-amber-400" />
-              <h3 className="text-xs font-bold text-slate-100">새 글 발행 이메일 알림</h3>
+              <Mail className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+              <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100">새 글 발행 이메일 알림</h3>
             </div>
             <button
               onClick={() => setIsSubscribeOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+              className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               aria-label="닫기"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <p className="text-[11px] text-slate-300 py-3 leading-relaxed">
+          <p className="text-[11px] text-slate-600 dark:text-slate-300 py-3 leading-relaxed">
             웹 풀스택, AI 에이전트, 실시간 시스템 아키텍처의 새로운 실무 글이 공개되면 가장 먼저 메일로 소식을 전해드립니다.
           </p>
 
@@ -138,7 +138,7 @@ export function HeaderActions() {
                 placeholder="you@example.com"
                 required
                 disabled={isSubmitting}
-                className="flex-1 text-xs bg-slate-950/80 border border-slate-700/80 rounded-xl px-3 py-2 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                className="flex-1 text-xs bg-white dark:bg-slate-950/80 border border-slate-300 dark:border-slate-700/80 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
               />
               <button
                 type="submit"
@@ -157,8 +157,8 @@ export function HeaderActions() {
               <div
                 className={`p-2 rounded-xl text-[11px] leading-relaxed border ${
                   subscribeResult.success
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                    : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-300'
+                    : 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-300'
                 }`}
               >
                 {subscribeResult.msg}
@@ -166,7 +166,7 @@ export function HeaderActions() {
             )}
           </form>
 
-          <div className="pt-2 mt-2 border-t border-slate-800/60 text-[10px] text-slate-500 font-mono text-center">
+          <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800/60 text-[10px] text-slate-500 font-mono text-center">
             스팸 없이 오직 신규 아티클 공개 시에만 발송됩니다.
           </div>
         </div>
