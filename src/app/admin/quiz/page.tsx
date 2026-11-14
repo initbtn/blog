@@ -47,10 +47,11 @@ interface Question {
   explain?: string;
 }
 
-const ALLOWED_ADMINS = [
-  'initbtn@gmail.com',
-  'waffle.dominic@gmail.com',
-];
+// Client-side whitelist (can be configured via NEXT_PUBLIC_ADMIN_EMAILS or fallback to empty array)
+const clientAllowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
 
 export default function AdminQuizDashboard() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -176,7 +177,8 @@ export default function AdminQuizDashboard() {
     setQuestions([]);
   };
 
-  const isAdmin = user && ALLOWED_ADMINS.some((a) => user.email?.toLowerCase().includes(a));
+  // If NEXT_PUBLIC_ADMIN_EMAILS is provided, check against it; otherwise authorize logged-in user to try backend API
+  const isAdmin = user && (clientAllowedEmails.length === 0 || clientAllowedEmails.some((a) => user.email?.toLowerCase().includes(a)));
 
   if (authLoading) {
     return (
