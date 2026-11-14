@@ -90,15 +90,26 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
     }
   }, []);
 
-  // 2. Fetch questions
+  // 2. Fetch questions (관리자 모드 전용: BLOG_ADMIN_KEY 인증 또는 /api/admin/quiz)
   useEffect(() => {
     async function loadQuestions() {
       try {
-        const res = await fetch('/data/ncs_questions.json');
+        const adminKey = typeof window !== 'undefined' ? localStorage.getItem('BLOG_ADMIN_KEY') : null;
+        if (!adminKey) {
+          // 비관리자/공개 방문자에게는 문제를 일체 노출하지 않음
+          setAllQuestions([]);
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`/api/admin/quiz?module=${moduleCode}`, {
+          headers: {
+            Authorization: `Bearer ${adminKey}`,
+          },
+        });
         if (!res.ok) throw new Error('Failed to fetch questions');
-        const data: Question[] = await res.json();
-        const filtered = data.filter((q) => q.ncs_module === moduleCode);
-        setAllQuestions(filtered);
+        const result = await res.json();
+        setAllQuestions(result.questions || []);
       } catch (err) {
         console.error('Failed to load topic questions', err);
       } finally {
