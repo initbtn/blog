@@ -29,8 +29,12 @@ function verifyAdminToken(req: NextRequest): boolean {
         const payload = JSON.parse(payloadJson);
         const email = payload.email || '';
         // Whitelist validation: initbtn or admin domain
-        const allowedEmails = (process.env.ADMIN_ALLOWED_EMAILS || 'initbtn@gmail.com,waffle.dominic@gmail.com').split(',');
-        if (allowedEmails.some((allowed) => email.toLowerCase().includes(allowed.trim().toLowerCase()))) {
+        const rawAllowed = process.env.ADMIN_EMAILS || process.env.ADMIN_ALLOWED_EMAILS || '';
+        const allowedEmails = rawAllowed
+          .split(',')
+          .map((e) => e.trim().toLowerCase())
+          .filter(Boolean);
+        if (allowedEmails.length > 0 && allowedEmails.some((allowed) => email.toLowerCase().includes(allowed))) {
           return true;
         }
       }
