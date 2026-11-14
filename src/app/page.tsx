@@ -20,21 +20,21 @@ export default function HomePage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10">
           <div className="space-y-4 max-w-xl">
             {/* Status pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-emerald-400 font-semibold">ONLINE</span>
-              <span className="text-slate-500">|</span>
-              <span className="font-mono text-sky-400 font-medium">@initbtn</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700/80 text-xs text-slate-700 dark:text-slate-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">ONLINE</span>
+              <span className="text-slate-400 dark:text-slate-500">|</span>
+              <span className="font-mono text-sky-600 dark:text-sky-400 font-medium">@initbtn</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
               Full-Stack & <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-teal-500 to-amber-600 dark:from-sky-400 dark:via-teal-300 dark:to-amber-300">
                 AI Systems Builder
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300/90 leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300/90 leading-relaxed">
               견고한 웹 풀스택 시스템부터 10Hz 실시간 데이터 파이프라인, AI RAG 에이전트까지.
               문제를 시스템으로 해결하는 과정과 트러블슈팅을 기록합니다.
             </p>
@@ -50,7 +50,7 @@ export default function HomePage() {
                 href="https://initbtn.github.io/resume-vuejs/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-slate-800/90 text-slate-200 border border-slate-700/80 text-xs sm:text-sm font-medium hover:border-slate-500 transition-colors"
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700/80 text-xs sm:text-sm font-medium transition-colors"
               >
                 이력서 확인 ↗
               </a>
@@ -95,17 +95,17 @@ export default function HomePage() {
       {/* Topic Tag Matrix */}
       {tags.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-xs font-mono uppercase tracking-widest text-slate-400 font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-sm bg-amber-400 inline-block" />
+          <h2 className="text-xs font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-sm bg-amber-500 dark:bg-amber-400 inline-block" />
             주제별 탐색 Matrix
           </h2>
           <div className="flex flex-wrap gap-2">
             {tags.map(({ tag, count }) => (
               <span
                 key={tag}
-                className="px-3 py-1 text-xs font-mono rounded-lg bg-slate-900/80 border border-slate-800 text-slate-300 hover:border-sky-500/60 hover:text-sky-300 transition-colors cursor-pointer"
+                className="px-3 py-1 text-xs font-mono rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-sky-500/60 hover:text-sky-600 dark:hover:text-sky-300 transition-colors cursor-pointer"
               >
-                #{tag} <span className="text-slate-500 ml-1">[{count}]</span>
+                #{tag} <span className="text-slate-400 dark:text-slate-500 ml-1">[{count}]</span>
               </span>
             ))}
           </div>
@@ -115,17 +115,17 @@ export default function HomePage() {
       {/* Regular Articles Section / Article Explorer */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-mono uppercase tracking-widest text-slate-400 font-semibold">
+          <h2 className="text-xs font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
             아티클 탐색기
           </h2>
-          <span className="text-xs font-mono text-slate-500">총 {posts.length}편</span>
+          <span className="text-xs font-mono text-slate-400 dark:text-slate-500">총 {posts.length}편</span>
         </div>
         <ArticleExplorer posts={posts} />
       </section>
 
       {/* Engineering Ecosystem Card */}
-      <section className="glass-panel rounded-2xl p-6 sm:p-8 space-y-4 border border-slate-800/80">
-        <h3 className="text-sm font-mono uppercase tracking-widest text-sky-400 font-semibold">
+      <section className="glass-panel rounded-2xl p-6 sm:p-8 space-y-4">
+        <h3 className="text-sm font-mono uppercase tracking-widest text-sky-600 dark:text-sky-400 font-semibold">
           Ecosystem & Cross-Links
         </h3>
         <div className="grid sm:grid-cols-3 gap-4 text-xs">
@@ -133,9 +133,9 @@ export default function HomePage() {
             href="https://initbtn.github.io/resume-vuejs/"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-sky-500/50 transition-colors block group"
+            className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50 transition-colors block group"
           >
-            <div className="font-bold text-slate-200 group-hover:text-sky-400 mb-1 flex items-center justify-between">
+            <div className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 mb-1 flex items-center justify-between">
               <span>Interactive Resume</span>
               <span>↗</span>
             </div>

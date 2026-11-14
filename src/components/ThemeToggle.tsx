@@ -14,7 +14,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-7 h-7 rounded-full bg-slate-800/40 border border-slate-700/50" />
+      <div className="w-7 h-7 rounded-full bg-slate-200/50 dark:bg-slate-800/40 border border-slate-300 dark:border-slate-700/50" />
     );
   }
 
@@ -26,12 +26,12 @@ export function ThemeToggle() {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
       title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
-      className="p-1.5 rounded-full border border-slate-700/60 hover:border-sky-500/50 hover:bg-sky-500/10 text-slate-400 hover:text-sky-400 transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+      className="p-1.5 rounded-full border border-slate-300 dark:border-slate-700/60 hover:border-sky-500/50 hover:bg-sky-500/10 text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center justify-center shrink-0 cursor-pointer"
     >
       {isDark ? (
         <Sun className="w-3.5 h-3.5 text-amber-400" />
       ) : (
-        <Moon className="w-3.5 h-3.5 text-sky-400" />
+        <Moon className="w-3.5 h-3.5 text-sky-600" />
       )}
     </button>
   );
