@@ -65,59 +65,59 @@ export function TopicFrequencyBadge({ slug }: TopicFrequencyBadgeProps) {
 
   if (stat.grade === 'GRADE A+') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-rose-500/10 text-rose-300 border border-rose-500/30 whitespace-nowrap shadow-sm">
-        <Flame className="w-3.5 h-3.5 text-rose-400 shrink-0 fill-rose-400/20" />
-        <span className="font-extrabold text-rose-300">{stat.grade}</span>
-        <span className="text-slate-600">/</span>
-        <span className="text-slate-200 font-normal">{stat.count} Qs</span>
-        <span className="text-rose-400 font-bold">({stat.percent})</span>
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-rose-500/10 text-rose-600 dark:text-rose-300 border border-rose-500/30 whitespace-nowrap shadow-sm">
+        <Flame className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 shrink-0 fill-rose-500/20 dark:fill-rose-400/20" />
+        <span className="font-extrabold text-rose-600 dark:text-rose-300">{stat.grade}</span>
+        <span className="text-slate-300 dark:text-slate-600">/</span>
+        <span className="text-slate-700 dark:text-slate-200 font-normal">{stat.count} Qs</span>
+        <span className="text-rose-600 dark:text-rose-400 font-bold">({stat.percent})</span>
       </span>
     );
   }
 
   if (stat.grade === 'GRADE A') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-amber-500/10 text-amber-300 border border-amber-500/25 whitespace-nowrap shadow-sm">
-        <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/25 whitespace-nowrap shadow-sm">
+        <Award className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
         <span className="font-bold">{stat.grade}</span>
-        <span className="text-slate-600">/</span>
-        <span className="text-slate-300 font-normal">{stat.count} Qs</span>
-        <span className="text-amber-400/80 font-semibold">({stat.percent})</span>
+        <span className="text-slate-300 dark:text-slate-600">/</span>
+        <span className="text-slate-700 dark:text-slate-300 font-normal">{stat.count} Qs</span>
+        <span className="text-amber-600 dark:text-amber-400/80 font-semibold">({stat.percent})</span>
       </span>
     );
   }
 
   if (stat.grade === 'GRADE B') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20 whitespace-nowrap">
-        <Zap className="w-3 h-3 text-sky-400 shrink-0" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 whitespace-nowrap">
+        <Zap className="w-3 h-3 text-sky-500 dark:text-sky-400 shrink-0" />
         <span className="font-bold">{stat.grade}</span>
-        <span className="text-slate-600">/</span>
-        <span className="text-slate-300 font-normal">{stat.count} Qs</span>
-        <span className="text-sky-400/80 font-semibold">({stat.percent})</span>
+        <span className="text-slate-300 dark:text-slate-600">/</span>
+        <span className="text-slate-700 dark:text-slate-300 font-normal">{stat.count} Qs</span>
+        <span className="text-sky-600 dark:text-sky-400/80 font-semibold">({stat.percent})</span>
       </span>
     );
   }
 
   if (stat.grade === 'GRADE C') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 whitespace-nowrap">
-        <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 whitespace-nowrap">
+        <CheckCircle2 className="w-3 h-3 text-emerald-500 dark:text-emerald-400 shrink-0" />
         <span className="font-bold">{stat.grade}</span>
-        <span className="text-slate-600">/</span>
-        <span className="text-slate-300 font-normal">{stat.count} Qs</span>
-        <span className="text-emerald-400/80 font-semibold">({stat.percent})</span>
+        <span className="text-slate-300 dark:text-slate-600">/</span>
+        <span className="text-slate-700 dark:text-slate-300 font-normal">{stat.count} Qs</span>
+        <span className="text-emerald-600 dark:text-emerald-400/80 font-semibold">({stat.percent})</span>
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-slate-800/80 text-slate-300 border border-slate-700/60 whitespace-nowrap">
-      <Bookmark className="w-3 h-3 text-slate-400 shrink-0" />
-      <span className="font-semibold text-slate-200">{stat.grade}</span>
-      <span className="text-slate-600">/</span>
-      <span className="text-slate-400 font-normal">{stat.count} Qs</span>
-      <span className="text-slate-400 font-medium">({stat.percent})</span>
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 whitespace-nowrap">
+      <Bookmark className="w-3 h-3 text-slate-500 dark:text-slate-400 shrink-0" />
+      <span className="font-semibold text-slate-800 dark:text-slate-200">{stat.grade}</span>
+      <span className="text-slate-300 dark:text-slate-600">/</span>
+      <span className="text-slate-600 dark:text-slate-400 font-normal">{stat.count} Qs</span>
+      <span className="text-slate-500 dark:text-slate-400 font-medium">({stat.percent})</span>
     </span>
   );
 }

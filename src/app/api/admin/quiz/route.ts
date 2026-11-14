@@ -34,7 +34,8 @@ function verifyAdminToken(req: NextRequest): boolean {
           .split(',')
           .map((e) => e.trim().toLowerCase())
           .filter(Boolean);
-        if (allowedEmails.length > 0 && allowedEmails.some((allowed) => email.toLowerCase().includes(allowed))) {
+        const normalizedEmail = email.trim().toLowerCase();
+        if (allowedEmails.length > 0 && allowedEmails.includes(normalizedEmail)) {
           return true;
         }
       }
