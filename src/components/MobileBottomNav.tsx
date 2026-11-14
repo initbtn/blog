@@ -40,7 +40,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-slate-800/90 shadow-2xl backdrop-blur-xl">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-slate-200 dark:border-slate-800/90 shadow-2xl backdrop-blur-xl">
       <div className="flex items-center justify-around h-16 max-w-md mx-auto px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -52,7 +52,7 @@ export function MobileBottomNav() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center flex-1 h-full py-1 text-slate-400 hover:text-slate-200 transition-colors"
+                className="flex flex-col items-center justify-center flex-1 h-full py-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
               >
                 <Icon className="w-5 h-5 mb-1" />
                 <span className="text-[10px] font-medium tracking-tight flex items-center">
@@ -68,14 +68,14 @@ export function MobileBottomNav() {
               href={item.href}
               className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-colors ${
                 item.isActive
-                  ? 'text-sky-400 font-semibold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'text-sky-600 dark:text-sky-400 font-semibold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 mb-1 transition-transform ${item.isActive ? 'scale-110' : ''}`} />
                 {item.isActive && (
-                  <span className="absolute -top-0.5 -right-1 w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+                  <span className="absolute -top-0.5 -right-1 w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400 animate-pulse" />
                 )}
               </div>
               <span className="text-[10px] tracking-tight">{item.name}</span>
