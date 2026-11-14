@@ -12438,26 +12438,26 @@
     "chapter": "소프트웨어공학",
     "ncs_module": "M3",
     "ncs_title": "아키텍처 & 객체지향 설계",
-    "question": "다음 클래스 다이어그램을 파이썬 코드로 표현한 것이다. (가) ～ (라)에 들어갈 내용으로 옳은 것은? class (가) : def __init__(self, name, price): self.name = name self.price = price def (나) (self): print(\"{}'s price = {}\".format(self.name, self.price)) class (다) ( (가) ): def __init__(self, name, price): Food.__init__(self, name, price) def (라) (self): print(\"{}\".format(self.name)) (가) (나) (다) (라)",
+    "question": "다음 클래스 다이어그램을 파이썬 코드로 표현한 것이다. (가) ～ (라)에 들어갈 내용으로 옳은 것은?\n\n[UML 클래스 다이어그램]\n┌───────────────────────────┐\n│           Food            │\n├───────────────────────────┤\n│ + name                    │\n│ + price                   │\n├───────────────────────────┤\n│ + show()                  │\n└─────────────▲─────────────┘\n              │ (상속 / 일반화)\n┌─────────────┴─────────────┐\n│          Korean           │\n├───────────────────────────┤\n│ + showname()              │\n└───────────────────────────┘\n\n[파이썬 코드]\nclass (가) :\n    def __init__(self, name, price):\n        self.name = name\n        self.price = price\n\n    def (나) (self):\n        print(\"{}'s price = {}\".format(self.name, self.price))\n\nclass (다) ( (가) ):\n    def __init__(self, name, price):\n        Food.__init__(self, name, price)\n\n    def (라) (self):\n        print(\"{}\".format(self.name))",
     "choices": [
       {
         "number": 1,
-        "text": "Food show Korean showname",
+        "text": "(가) Food | (나) show | (다) Korean | (라) showname",
         "is_correct": true
       },
       {
         "number": 2,
-        "text": "Korean showname Food show",
+        "text": "(가) Korean | (나) showname | (다) Food | (라) show",
         "is_correct": false
       },
       {
         "number": 3,
-        "text": "Food showname Korean show",
+        "text": "(가) Food | (나) showname | (다) Korean | (라) show",
         "is_correct": false
       },
       {
         "number": 4,
-        "text": "Korean show Food showname",
+        "text": "(가) Korean | (나) show | (다) Food | (라) showname",
         "is_correct": false
       }
     ],
@@ -12812,31 +12812,31 @@
     "chapter": "소프트웨어공학",
     "ncs_module": "M3",
     "ncs_title": "아키텍처 & 객체지향 설계",
-    "question": "다음 Java 코드에서 생략된 부분을 고려하지 않고 명시된 부분만으로 UML 클래스 다이어그램을 작성하였을 때, 다이어그램에 나타나지 않는 관계는? class Person { ... } class Work { ... } interface PublicService { public void doWork(Work work); } class Official extends Person implements Publ icService { public void sayHello() { ... } public void doWork(Work work) { ... } ... }",
+    "question": "다음 Java 코드에서 생략된 부분을 고려하지 않고 명시된 부분만으로 UML 클래스 다이어그램을 작성하였을 때, 다이어그램에 나타나지 않는 관계는?\n\nclass Person { ... }\n\nclass Work { ... }\n\ninterface PublicService {\n    public void doWork(Work work);\n}\n\nclass Official extends Person implements PublicService {\n    public void sayHello() { ... }\n    public void doWork(Work work) { ... }\n    ...\n}",
     "choices": [
       {
         "number": 1,
-        "text": "",
+        "text": "의존(Dependency) 관계 (점선 열린 화살표)",
         "is_correct": false
       },
       {
         "number": 2,
-        "text": "",
+        "text": "집약(Aggregation) 관계 (속이 빈 마름모가 달린 실선)",
         "is_correct": true
       },
       {
         "number": 3,
-        "text": "",
+        "text": "실체화(Realization) 관계 (점선 빈 삼각형 화살표)",
         "is_correct": false
       },
       {
         "number": 4,
-        "text": "",
+        "text": "일반화(Generalization) 관계 (실선 빈 삼각형 화살표)",
         "is_correct": false
       }
     ],
     "answer": 2,
-    "explain": "[정답] 2번: \n[핵심 해설] NCS 직무기준 및 공인 정답에 따른 해설입니다. 출제 키워드와 선지의 함정 요소를 대조하여 오개념을 배제하십시오.",
+    "explain": "[정답] 2번: 집약(Aggregation) 관계 (속이 빈 마름모가 달린 실선)\n[핵심 해설] \n1. 일반화(상속): class Official extends Person 에 의해 실선 빈 삼각형 화살표로 나타납니다.\n2. 실체화(구현): class Official ... implements PublicService 에 의해 점선 빈 삼각형 화살표로 나타납니다.\n3. 의존: doWork(Work work) 메서드의 매개변수로 Work 클래스를 사용하므로 점선 열린 화살표로 나타납니다.\n4. 집약: 코드 내에 Work 를 멤버 변수(필드)로 소유하는 전체-부분(has-a) 관계가 없으므로 다이어그램에 나타나지 않습니다.",
     "subtopic_id": "3-1"
   },
   {
@@ -12982,7 +12982,7 @@
     "chapter": "소프트웨어공학",
     "ncs_module": "M3",
     "ncs_title": "아키텍처 & 객체지향 설계",
-    "question": "다음은 모듈을 구성하는 코드의 일부이다. 두 함수 A( )와 B( ) 사이에 형성되는 결합으로 옳은 것은? (단, ...은 생략된 코드이며, 해당 코드는 고려하지 않는다) int A(){ int a; ... B(a); ... } int B(int x){ ... if(x > 0) /* send data */ else /* receive data */ }",
+    "question": "다음은 모듈을 구성하는 코드의 일부이다. 두 함수 A( )와 B( ) 사이에 형성되는 결합으로 옳은 것은? (단, ...은 생략된 코드이며, 해당 코드는 고려하지 않는다)\n\nint A() {\n    int a;\n    ...\n    B(a);\n    ...\n}\n\nint B(int x) {\n    ...\n    if (x > 0) /* send data */\n    else       /* receive data */\n}",
     "choices": [
       {
         "number": 1,
@@ -14988,7 +14988,7 @@
     "chapter": "소프트웨어공학",
     "ncs_module": "M3",
     "ncs_title": "아키텍처 & 객체지향 설계",
-    "question": "다음은 두 정수를 입력받아 큰 값을 출력하는 프로그램이다. 이 프로그램에서 caller 함수와 max 함수 간의 결합도와 max 함수의 응집도를 바르게 나열한 것은? void caller(int x, int y) { int maxVal = max(x, y); printf(\"%d\", maxVal); } int max(int v1, int v2) { if (v1 > v2) return v1; else return v2; }",
+    "question": "다음은 두 정수를 입력받아 큰 값을 출력하는 프로그램이다. 이 프로그램에서 caller 함수와 max 함수 간의 결합도와 max 함수의 응집도를 바르게 나열한 것은?\n\nvoid caller(int x, int y) {\n    int maxVal = max(x, y);\n    printf(\"%d\", maxVal);\n}\n\nint max(int v1, int v2) {\n    if (v1 > v2)\n        return v1;\n    else\n        return v2;\n}",
     "choices": [
       {
         "number": 1,
@@ -15124,7 +15124,7 @@
     "chapter": "소프트웨어공학",
     "ncs_module": "M3",
     "ncs_title": "아키텍처 & 객체지향 설계",
-    "question": "다음 Java 코드의 MyEmployeeService, EmployeeService, EmployeeDao, Employee 클래스를 UML 클래스 다이어그램으로 표현하였을 때 클래스 다이어그램에 나타나지 않는 관계는? (단, MyEmployeeService, EmployeeService, EmployeeDao, Employee 클래스는 이 외 다른 클래스와 아무 관계가 없다) class MyEmployeeService extends EmployeeService{ private EmployeeDao employeeDao; public void setEmployeeDao(EmployeeDao dao){ this.employeeDao = dao; } public Employee getEmployee(String id){ return employeeDao.get(id); } public void addEmployee(Employee emp){ employeeDao.insert(emp); } } class EmployeeService { ... } class EmployeeDao { ... } class Employee { ... }",
+    "question": "다음 Java 코드의 MyEmployeeService, EmployeeService, EmployeeDao, Employee 클래스를 UML 클래스 다이어그램으로 표현하였을 때 클래스 다이어그램에 나타나지 않는 관계는? (단, MyEmployeeService, EmployeeService, EmployeeDao, Employee 클래스는 이 외 다른 클래스와 아무 관계가 없다)\n\nclass MyEmployeeService extends EmployeeService {\n    private EmployeeDao employeeDao;\n\n    public void setEmployeeDao(EmployeeDao dao) {\n        this.employeeDao = dao;\n    }\n\n    public Employee getEmployee(String id) {\n        return employeeDao.get(id);\n    }\n\n    public void addEmployee(Employee emp) {\n        employeeDao.insert(emp);\n    }\n}\n\nclass EmployeeService { ... }\nclass EmployeeDao { ... }\nclass Employee { ... }",
     "choices": [
       {
         "number": 1,
