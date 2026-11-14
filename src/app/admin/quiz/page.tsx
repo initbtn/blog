@@ -47,12 +47,6 @@ interface Question {
   explain?: string;
 }
 
-// Client-side whitelist (can be configured via NEXT_PUBLIC_ADMIN_EMAILS or fallback to empty array)
-const clientAllowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '')
-  .split(',')
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
-
 export default function AdminQuizDashboard() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -62,6 +56,7 @@ export default function AdminQuizDashboard() {
   const [selectedSubject, setSelectedSubject] = useState<'swe' | 'history'>('swe');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
+  const [isForbidden, setIsForbidden] = useState(false);
 
   // Quiz Interaction State
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -139,6 +134,9 @@ export default function AdminQuizDashboard() {
           const result = await res.json();
           setQuestions(result.questions || []);
           setCurrentIndex(0);
+          setIsForbidden(false);
+        } else if (res.status === 401 || res.status === 403) {
+          setIsForbidden(true);
         } else {
           console.error('Failed to fetch private questions');
         }
@@ -175,10 +173,8 @@ export default function AdminQuizDashboard() {
   const handleLogout = async () => {
     await signOut(auth);
     setQuestions([]);
+    setIsForbidden(false);
   };
-
-  // If NEXT_PUBLIC_ADMIN_EMAILS is provided, check against it; otherwise authorize logged-in user to try backend API
-  const isAdmin = user && (clientAllowedEmails.length === 0 || clientAllowedEmails.some((a) => user.email?.toLowerCase().includes(a)));
 
   if (authLoading) {
     return (
@@ -214,15 +210,15 @@ export default function AdminQuizDashboard() {
     );
   }
 
-  // Unauthorized Email
-  if (!isAdmin) {
+  // Forbidden (Unauthorized Email or non-admin)
+  if (isForbidden) {
     return (
       <div className="max-w-md mx-auto py-16 text-center space-y-4">
         <div className="glass-panel rounded-2xl p-8 space-y-4 border border-rose-500/40 bg-rose-950/10">
           <ShieldAlert className="w-10 h-10 mx-auto text-rose-400" />
           <h2 className="text-lg font-bold text-rose-200">접근 권한 제한 (403)</h2>
           <p className="text-xs text-slate-400">
-            인증된 계정(<code>{user.email}</code>)은 관리자 화이트리스트에 등록되어 있지 않습니다.
+            인증된 계정(<code>{user.email}</code>)은 관리자 권한이 없습니다.
           </p>
           <button
             onClick={handleLogout}
