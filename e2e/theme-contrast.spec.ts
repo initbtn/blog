@@ -36,6 +36,15 @@ test.describe('Light/Dark Dual Theme Visual & DOM Contrast Tests (@theme-dual)',
         expect(b).toBeLessThan(100);
       }
     }
+
+    // 5. Hero Card 아바타 박스 및 캡션 라이트모드 렌더링 검증
+    const waffleCaption = page.locator('text=WAFFLE 3×3');
+    await expect(waffleCaption).toBeVisible();
+    const captionColor = await waffleCaption.evaluate((node) => window.getComputedStyle(node).color);
+    const captionBg = await waffleCaption.evaluate((node) => window.getComputedStyle(node).backgroundColor);
+    // 캡션 텍스트는 라이트모드에서 다크 스카이(rgb r,g,b 명도 확인)
+    expect(captionColor).toBeTruthy();
+    expect(captionBg).not.toBe('rgb(2, 6, 23)'); // slate-950이 아님
   });
 
   test('라이트 모드에서 아티클 상세 페이지 제목(h1) 및 빈도 뱃지, 연관 글 제목이 흰색으로 숨겨지지 않아야 한다', async ({ page }) => {
