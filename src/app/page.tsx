@@ -83,8 +83,8 @@ export default function HomePage() {
       {featuredPost && (
         <section className="space-y-4">
           <div className="flex items-center justify-between pb-1">
-            <h2 className="text-xs font-mono uppercase tracking-widest text-slate-400 font-semibold flex items-center gap-2">
-              <span className="w-2 h-2 rounded-sm bg-sky-400 inline-block" />
+            <h2 className="text-xs font-mono uppercase tracking-widest text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-2">
+              <span className="w-2 h-2 rounded-sm bg-sky-500 dark:bg-sky-400 inline-block" />
               최신 기술 심층 아티클
             </h2>
           </div>
@@ -135,11 +135,11 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50 transition-colors block group"
           >
-            <div className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 mb-1 flex items-center justify-between">
+            <div className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 mb-1 flex items-center justify-between">
               <span>Interactive Resume</span>
               <span>↗</span>
             </div>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-xs sm:text-sm">
               Vue 3 + Vite 기반의 포트폴리오. WAS 보안 게이트웨이 및 원격 Supabase 연동.
             </p>
           </a>
@@ -148,13 +148,13 @@ export default function HomePage() {
             href="https://github.com/initbtn/marine-sensor-gis"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-sky-500/50 transition-colors block group"
+            className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50 transition-colors block group"
           >
-            <div className="font-bold text-slate-200 group-hover:text-sky-400 mb-1 flex items-center justify-between">
+            <div className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 mb-1 flex items-center justify-between">
               <span>Marine GIS Dashboard</span>
               <span>↗</span>
             </div>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-xs sm:text-sm">
               10Hz 해양 센서 텔레메트리, 실시간 추측항법(Dead Reckoning) 엔진.
             </p>
           </a>
@@ -163,13 +163,13 @@ export default function HomePage() {
             href="https://github.com/initbtn/assist"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-sky-500/50 transition-colors block group"
+            className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50 transition-colors block group"
           >
-            <div className="font-bold text-slate-200 group-hover:text-sky-400 mb-1 flex items-center justify-between">
+            <div className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 mb-1 flex items-center justify-between">
               <span>Assist AI Agent</span>
               <span>↗</span>
             </div>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-xs sm:text-sm">
               온디바이스 sLM 기반 지식 RAG 파이프라인 및 엔지니어링 에이전트.
             </p>
           </a>

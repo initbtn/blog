@@ -83,10 +83,10 @@ export function Header() {
           <HeaderActions />
 
           {/* Mobile direct icons (Email, GitHub) */}
-          <div className="flex md:hidden items-center gap-0.5 border-l border-slate-800 pl-1.5 ml-0.5">
+          <div className="flex md:hidden items-center gap-0.5 border-l border-slate-200 dark:border-slate-800 pl-1.5 ml-0.5">
             <a
               href="mailto:min2spapa@gmail.com"
-              className="p-1.5 rounded-full text-slate-400 hover:text-amber-400 transition-colors"
+              className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
               aria-label="이메일 문의"
             >
               <Mail className="w-4 h-4" />
@@ -95,7 +95,7 @@ export function Header() {
               href="https://github.com/initbtn"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-full text-slate-400 hover:text-slate-200 transition-colors"
+              className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
               aria-label="GitHub Profile"
             >
               <GithubIcon className="w-4 h-4" />
