@@ -42,9 +42,9 @@ export function RelatedPosts({ currentSlug, currentTags, allPosts }: RelatedPost
   if (related.length === 0) return null;
 
   return (
-    <section className="space-y-4 pt-4 border-t border-slate-800/80">
-      <div className="flex items-center gap-2 text-xs font-mono font-semibold text-slate-300">
-        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+    <section className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800/80">
+      <div className="flex items-center gap-2 text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
+        <Sparkles className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
         <span>함께 학습하면 좋은 연관 주제</span>
       </div>
 
@@ -52,26 +52,26 @@ export function RelatedPosts({ currentSlug, currentTags, allPosts }: RelatedPost
         {related.map((post) => (
           <article
             key={post.slug}
-            className="group glass-panel rounded-xl p-4 border border-slate-800/90 hover:border-slate-700 hover:bg-slate-800/30 transition-all flex flex-col justify-between gap-3"
+            className="group glass-panel rounded-xl p-4 border border-slate-200 dark:border-slate-800/90 hover:border-sky-500/50 dark:hover:border-slate-700 hover:bg-slate-100/50 dark:hover:bg-slate-800/30 transition-all flex flex-col justify-between gap-3"
           >
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <span className="font-mono text-[11px] text-slate-500">{post.date}</span>
+                <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">{post.date}</span>
                 <TopicFrequencyBadge slug={post.slug} />
               </div>
 
-              <h4 className="text-sm font-bold text-slate-200 group-hover:text-sky-400 transition-colors line-clamp-2 leading-snug">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 leading-snug">
                 <Link href={`/posts/${post.slug}`}>
                   {post.title}
                 </Link>
               </h4>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-slate-800/50 text-xs">
-              <span className="font-mono text-[11px] text-amber-400/80">{post.readingTime}</span>
+            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800/50 text-xs">
+              <span className="font-mono text-[11px] text-amber-600 dark:text-amber-400/80">{post.readingTime}</span>
               <Link
                 href={`/posts/${post.slug}`}
-                className="inline-flex items-center gap-1 text-[11px] font-medium text-sky-400 group-hover:translate-x-0.5 transition-transform"
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-sky-600 dark:text-sky-400 group-hover:translate-x-0.5 transition-transform"
               >
                 <span>학습하기</span>
                 <ArrowRight className="w-3 h-3" />

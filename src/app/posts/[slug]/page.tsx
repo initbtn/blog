@@ -182,10 +182,10 @@ export default async function PostPage({ params }: PostPageProps) {
       />
 
       {/* Post Footer */}
-      <footer className="glass-panel rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <footer className="glass-panel rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 dark:text-slate-400">
         <Link
           href="/"
-          className="text-sky-400 hover:text-sky-300 font-medium inline-flex items-center gap-1 font-mono"
+          className="text-sky-600 dark:text-sky-400 hover:text-sky-500 font-medium inline-flex items-center gap-1 font-mono"
         >
           ← 아티클 목록 전체보기
         </Link>
@@ -196,7 +196,7 @@ export default async function PostPage({ params }: PostPageProps) {
             href="https://initbtn.github.io/resume-vuejs/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-300 hover:text-sky-400 transition-colors"
+            className="text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
           >
             이력서 ↗
           </a>

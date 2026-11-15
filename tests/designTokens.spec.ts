@@ -9,6 +9,8 @@ describe('Design Tokens Dual-Theme Compliance', () => {
     'src/components/HeaderActions.tsx',
     'src/components/Header.tsx',
     'src/components/PostCard.tsx',
+    'src/components/RelatedPosts.tsx',
+    'src/app/page.tsx',
     'src/app/about/page.tsx',
   ];
 
@@ -60,5 +62,21 @@ describe('Design Tokens Dual-Theme Compliance', () => {
     // handleShare 버튼이 라이트모드 스타일을 갖추고 있는지 검증
     expect(content).toContain('dark:bg-slate-800');
     expect(content).toContain('dark:text-slate-200');
+  });
+
+  it('RelatedPosts 컴포넌트는 h4 제목에 라이트모드 slate-900 및 다크모드 slate-100 대칭 토큰을 사용해야 한다', () => {
+    const fullPath = path.resolve(process.cwd(), 'src/components/RelatedPosts.tsx');
+    const content = fs.readFileSync(fullPath, 'utf-8');
+
+    expect(content).toContain('text-slate-900 dark:text-slate-100');
+    expect(content).not.toMatch(/h4[^>]*text-slate-200\b(?!.*dark:)/);
+  });
+
+  it('Home page 프로젝트 카드는 다크 전용 text-slate-200 단독 사용 없이 듀얼 토큰을 사용해야 한다', () => {
+    const fullPath = path.resolve(process.cwd(), 'src/app/page.tsx');
+    const content = fs.readFileSync(fullPath, 'utf-8');
+
+    expect(content).toContain('text-slate-900 dark:text-slate-100');
+    expect(content).not.toMatch(/font-bold\s+text-slate-200\b(?!.*dark:)/);
   });
 });
