@@ -61,7 +61,7 @@ export default function HomePage() {
           <div className="shrink-0 mx-auto md:mx-0">
             <div className="relative group">
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500 to-amber-400 opacity-30 blur-md group-hover:opacity-60 transition duration-500" />
-              <div className="relative w-44 h-44 sm:w-48 sm:h-48 rounded-2xl bg-slate-900 border-2 border-slate-700/80 p-3 flex flex-col items-center justify-between shadow-2xl">
+              <div className="relative w-44 h-44 sm:w-48 sm:h-48 rounded-2xl bg-slate-100 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700/80 p-3 flex flex-col items-center justify-between shadow-2xl">
                 <Image
                   src="/avatar.png"
                   alt="Waffle Keycap Mascot"
@@ -70,7 +70,7 @@ export default function HomePage() {
                   className="rounded-xl object-contain drop-shadow-md group-hover:scale-105 transition-transform"
                   priority
                 />
-                <div className="w-full text-center py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[10px] font-mono text-sky-400 font-bold">
+                <div className="w-full text-center py-0.5 rounded bg-slate-200/90 dark:bg-slate-950/80 border border-slate-300 dark:border-slate-800 text-[10px] font-mono text-sky-700 dark:text-sky-400 font-bold">
                   WAFFLE 3×3
                 </div>
               </div>

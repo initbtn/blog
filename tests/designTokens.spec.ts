@@ -79,4 +79,14 @@ describe('Design Tokens Dual-Theme Compliance', () => {
     expect(content).toContain('text-slate-900 dark:text-slate-100');
     expect(content).not.toMatch(/font-bold\s+text-slate-200\b(?!.*dark:)/);
   });
+
+  it('Home page Hero Card의 아바타 래퍼 및 캡션은 라이트/다크 듀얼 토큰을 사용해야 한다', () => {
+    const fullPath = path.resolve(process.cwd(), 'src/app/page.tsx');
+    const content = fs.readFileSync(fullPath, 'utf-8');
+
+    // 아바타 래퍼 박스는 라이트 모드 배경과 다크 모드 배경을 모두 포함해야 함
+    expect(content).toMatch(/rounded-2xl\s+bg-slate-100\s+dark:bg-slate-900/);
+    // 아바타 캡션 박스도 라이트 모드/다크 모드 대칭 토큰을 포함해야 함
+    expect(content).toMatch(/rounded\s+bg-slate-200\/90\s+dark:bg-slate-950\/80/);
+  });
 });
