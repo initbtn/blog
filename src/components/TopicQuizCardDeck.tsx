@@ -623,7 +623,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                       'bg-rose-500/10 dark:bg-rose-950/40 border-rose-500/80 text-rose-800 dark:text-rose-200 font-medium shadow-sm';
                     badgeStyle = 'bg-rose-500 text-white font-bold';
                   } else {
-                    btnStyle = 'opacity-40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500';
+                    btnStyle = 'opacity-60 bg-slate-50/40 dark:bg-slate-900/20 border-slate-200/80 dark:border-slate-800/60 text-slate-600 dark:text-slate-400';
                   }
                 }
 
