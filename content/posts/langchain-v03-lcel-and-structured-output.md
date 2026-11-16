@@ -34,12 +34,25 @@ LangChain 팀은 v0.2와 v0.3에 이르러 이 모든 레거시 체인을 전면
 
 LCEL의 핵심은 매우 단순합니다. 파이프라인을 구성하는 모든 구성 요소(프롬프트, 모델, 파서, 커스텀 함수)가 단 하나의 표준 인터페이스인 **`Runnable`**을 구현하는 것입니다.
 
+<div className="rounded-xl overflow-hidden bg-slate-950/90 border border-slate-800/90 shadow-inner my-6">
+  <div className="text-[11px] font-mono font-semibold text-slate-400 flex items-center justify-between px-3.5 py-1.5 bg-slate-900/80 border-b border-slate-800/80">
+    <div className="flex items-center gap-1.5">
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <span className="text-emerald-300 font-bold">&lt;LCEL 데이터 변환 파이프라인&gt;</span>
+    </div>
+    <span className="text-[10px] text-slate-500 font-normal">Runnable Protocol</span>
+  </div>
+
+  <div className="p-4 sm:p-5">
+
+```mermaid
+flowchart LR
+    P["PromptTemplate\n(Input -> Dict/PromptValue)"] -->|"파이프 연산자"| M["ChatModel\n(Dict -> BaseMessage)"]
+    M -->|"파이프 연산자"| O["OutputParser\n(BaseMessage -> Struct/Pydantic)"]
 ```
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│ PromptTemplate  │  ───► │    ChatModel    │  ───► │  OutputParser   │
-│ (Input -> Dict) │       │ (Dict -> Msg)   │       │ (Msg -> Struct) │
-└─────────────────┘   |   └─────────────────┘   |   └─────────────────┘
-```
+
+  </div>
+</div>
 
 모든 `Runnable` 객체는 파이프 연산자(`|`)를 통해 체이닝되며, 자동으로 다음 4가지 핵심 메서드를 완벽히 보장합니다:
 
