@@ -341,9 +341,23 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
     // Dynamic extraction from explanation (remove spoilers)
     if (ex.includes('[핵심 해설]')) {
       const parts = ex.split('[핵심 해설]');
-      if (parts[1] && parts[1].length > 10) {
-        const clean = parts[1].replace(/\[.*?\]/g, '').trim();
-        return clean.length > 90 ? clean.substring(0, 90) + '...' : clean;
+      if (parts[1]) {
+        // [오답 분석] 전까지만 취합
+        const coreExp = parts[1].split('[오답 분석]')[0].trim();
+        // 각 줄 중 유의미한 첫 문맥 추출
+        const lines = coreExp
+          .split('\n')
+          .map((l) => l.replace(/^[-\s*•]+/, '').trim())
+          .filter((l) => l.length > 5);
+
+        if (lines.length > 0) {
+          const firstLine = lines[0];
+          // 정답 번호나 직접적인 스포일러 방지 필터링
+          const clean = firstLine.replace(/\[\d+번\]|\(정답.*?\)|정답은\s*\d+번/g, '').trim();
+          if (clean.length > 10) {
+            return clean.length > 95 ? clean.substring(0, 95) + '...' : clean;
+          }
+        }
       }
     }
 
