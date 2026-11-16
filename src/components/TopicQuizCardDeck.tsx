@@ -15,6 +15,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { FormattedQuestion } from './FormattedQuestion';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Choice {
   number: number;
@@ -53,6 +54,7 @@ interface QuizAnswerRecord {
 }
 
 export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: TopicQuizCardDeckProps) {
+  const { idToken } = useAuth();
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -90,12 +92,14 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
     }
   }, []);
 
-  // 2. Fetch questions (관리자 모드 전용: BLOG_ADMIN_KEY 인증 또는 /api/admin/quiz)
+  // 2. Fetch questions (관리자 모드 전용: Google Auth idToken 또는 구형 BLOG_ADMIN_KEY 인증)
   useEffect(() => {
     async function loadQuestions() {
       try {
-        const adminKey = typeof window !== 'undefined' ? localStorage.getItem('BLOG_ADMIN_KEY') : null;
-        if (!adminKey) {
+        const legacyAdminKey = typeof window !== 'undefined' ? localStorage.getItem('BLOG_ADMIN_KEY') : null;
+        const authToken = idToken || legacyAdminKey;
+
+        if (!authToken) {
           // 비관리자/공개 방문자에게는 문제를 일체 노출하지 않음
           setAllQuestions([]);
           setLoading(false);
@@ -104,7 +108,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
 
         const res = await fetch(`/api/admin/quiz?module=${moduleCode}`, {
           headers: {
-            Authorization: `Bearer ${adminKey}`,
+            Authorization: `Bearer ${authToken}`,
           },
         });
         if (!res.ok) throw new Error('Failed to fetch questions');
@@ -117,7 +121,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
       }
     }
     loadQuestions();
-  }, [moduleCode]);
+  }, [moduleCode, idToken]);
 
   // If subTopicCode is not provided, fallback to 'all'
   useEffect(() => {
