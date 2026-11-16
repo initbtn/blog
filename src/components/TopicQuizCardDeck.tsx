@@ -582,27 +582,6 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
             {/* Smart Question Formatter */}
             <FormattedQuestion questionIndex={currentIndex + 1} rawText={currentQ.question} />
 
-            {/* Zero-Layout-Shift Hint Box */}
-            <div
-              className={`rounded-xl border transition-all duration-200 overflow-hidden ${
-                globalHintEnabled
-                  ? 'bg-amber-500/5 border-amber-500/25 p-3 sm:p-3.5 opacity-100 max-h-48'
-                  : 'max-h-0 opacity-0 border-transparent p-0 m-0 pointer-events-none'
-              }`}
-            >
-              <div className="flex items-start gap-2.5">
-                <Lightbulb className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <div className="text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                    핵심 개념 힌트
-                  </div>
-                  <p className="text-xs text-amber-900/90 dark:text-amber-200/90 leading-relaxed font-sans">
-                    {getQuestionHint(currentQ)}
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* 4 Choices */}
             <div className="space-y-2 pt-1">
               {currentQ.choices.map((choice) => {
@@ -644,9 +623,32 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                 );
               })}
             </div>
+
+            {/* Zero-Layout-Shift Hint Box (정답 선택 전 활성화 시 노출) */}
+            {!isAnswered && (
+              <div
+                className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                  globalHintEnabled
+                    ? 'bg-amber-500/5 border-amber-500/25 p-3 sm:p-3.5 opacity-100 max-h-48'
+                    : 'max-h-0 opacity-0 border-transparent p-0 m-0 pointer-events-none'
+                }`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <Lightbulb className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <div className="text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                      핵심 개념 힌트
+                    </div>
+                    <p className="text-xs text-amber-900/90 dark:text-amber-200/90 leading-relaxed font-sans">
+                      {getQuestionHint(currentQ)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Answer Status & Explanation Accordion */}
+          {/* Answer Status & Explanation Accordion (정답 선택 후 힌트 위치에서 해설로 대체 노출) */}
           {isAnswered && (
             <div
               className={`rounded-xl p-3 sm:p-4 border transition-all space-y-2 animate-in fade-in-50 duration-200 ${

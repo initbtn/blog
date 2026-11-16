@@ -97,5 +97,30 @@ describe('Quiz Deck Design Tokens (Light/Dark 1:1 Parity)', () => {
       expect(choiceButton.className).toContain('text-slate-800');
       expect(choiceButton.className).toContain('dark:text-slate-200');
     });
+
+    it('정답을 선택하기 전 힌트 토글 시 힌트가 노출되고, 정답 선택 후에는 해설 섹션으로 대체된다', async () => {
+      render(<TopicQuizCardDeck moduleCode="M1" subTopicCode="1-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText(/순차적 모델/i)).toBeDefined();
+      });
+
+      // 힌트 켜기 버튼 클릭
+      const hintButton = screen.getByTitle(/힌트 켜기/i);
+      hintButton.click();
+
+      // 힌트 박스 노출 확인
+      expect(await screen.findByText(/핵심 개념 힌트/i)).toBeDefined();
+
+      // 1번 선지(정답) 선택
+      const choiceButton = screen.getByRole('button', { name: /1 순차적 모델/i });
+      choiceButton.click();
+
+      // 정답 상태 확인
+      expect(await screen.findByText(/정답 \(정답: 1번\)/i)).toBeDefined();
+
+      // 힌트 박스는 해설로 대체되어 렌더링되지 않아야 함
+      expect(screen.queryByText(/핵심 개념 힌트/i)).toBeNull();
+    });
   });
 });
