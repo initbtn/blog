@@ -45,36 +45,31 @@ draft: false
   <div className="p-4 sm:p-5">
 
 ```mermaid
-flowchart TD
-    %% 1. 인터페이스 계층
-    subgraph Tier1 ["Interface Layer (접점)"]
-        Web["Web Client (domlog)"]
-        Telegram["Telegram Bot"]
+flowchart LR
+    subgraph UI ["Interface"]
+        Web["Web domlog"]
+        TG["Telegram Bot"]
     end
 
-    %% 2. 오케스트레이션 & 게이트웨이 계층
-    subgraph Tier2 ["Orchestration & Gateway Layer (배관)"]
-        LCEL["LangChain LCEL Pipeline"]
-        Gateway["GCP VM Gateway (FastAPI)"]
+    subgraph Core ["Orchestration"]
+        LCEL["LangChain LCEL"]
+        GW["GCP Gateway"]
     end
 
-    %% 3. 지능 엔진 계층
-    subgraph Tier3 ["Intelligence Engine (사서 & 두뇌)"]
-        Snowflake["Snowflake Arctic Embed (사서)"]
-        SLM["sLM: Gemma 3 / Hermes 3 (두뇌)"]
+    subgraph Engine ["Intelligence"]
+        Arctic["Snowflake Arctic (사서)"]
+        SLM["Gemma 3 / Hermes 3 (두뇌)"]
     end
 
-    %% 4. 데이터 저장소 계층
-    subgraph Tier4 ["Data & Storage Layer (저장소)"]
-        PGVector[("Supabase PGVector (HNSW)")]
-        Firestore[("Cloud Firestore")]
+    subgraph Store ["Storage"]
+        PG[("Supabase PGVector")]
+        FS[("Firestore")]
     end
 
-    %% 계층 간 단일 상하 결합 흐름
-    Tier1 <==> Tier2
-    Tier2 <==> Tier3
-    Tier3 <--> PGVector
-    Tier2 --> Firestore
+    UI --> Core
+    Core --> Engine
+    Engine --> PG
+    Core --> FS
 ```
 
   </div>
