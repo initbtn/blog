@@ -341,9 +341,23 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
     // Dynamic extraction from explanation (remove spoilers)
     if (ex.includes('[핵심 해설]')) {
       const parts = ex.split('[핵심 해설]');
-      if (parts[1] && parts[1].length > 10) {
-        const clean = parts[1].replace(/\[.*?\]/g, '').trim();
-        return clean.length > 90 ? clean.substring(0, 90) + '...' : clean;
+      if (parts[1]) {
+        // [오답 분석] 전까지만 취합
+        const coreExp = parts[1].split('[오답 분석]')[0].trim();
+        // 각 줄 중 유의미한 첫 문맥 추출
+        const lines = coreExp
+          .split('\n')
+          .map((l) => l.replace(/^[-\s*•]+/, '').trim())
+          .filter((l) => l.length > 5);
+
+        if (lines.length > 0) {
+          const firstLine = lines[0];
+          // 정답 번호나 직접적인 스포일러 방지 필터링
+          const clean = firstLine.replace(/\[\d+번\]|\(정답.*?\)|정답은\s*\d+번/g, '').trim();
+          if (clean.length > 10) {
+            return clean.length > 95 ? clean.substring(0, 95) + '...' : clean;
+          }
+        }
       }
     }
 
@@ -609,7 +623,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                       'bg-rose-500/10 dark:bg-rose-950/40 border-rose-500/80 text-rose-800 dark:text-rose-200 font-medium shadow-sm';
                     badgeStyle = 'bg-rose-500 text-white font-bold';
                   } else {
-                    btnStyle = 'opacity-40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500';
+                    btnStyle = 'opacity-60 bg-slate-50/40 dark:bg-slate-900/20 border-slate-200/80 dark:border-slate-800/60 text-slate-600 dark:text-slate-400';
                   }
                 }
 

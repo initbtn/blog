@@ -477,7 +477,7 @@ export default function AdminQuizDashboard() {
                   } else if (isSelected) {
                     btnStyle = 'border-rose-500/60 bg-rose-500/10 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 font-semibold';
                   } else {
-                    btnStyle = 'border-slate-200/40 dark:border-slate-800/40 opacity-40 text-slate-400 dark:text-slate-500';
+                    btnStyle = 'opacity-60 bg-slate-50/40 dark:bg-slate-900/20 border-slate-200/80 dark:border-slate-800/60 text-slate-600 dark:text-slate-400';
                   }
                 }
 
