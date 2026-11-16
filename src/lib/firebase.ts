@@ -11,9 +11,35 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase once
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-export const db = getFirestore(app);
+// Initialize Firebase once with graceful fallback for test / CI environments
+const isConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+
+let app: any = null;
+let auth: any = null;
+let googleProvider: any = null;
+let db: any = null;
+
+if (getApps().length > 0) {
+  app = getApp();
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+  db = getFirestore(app);
+} else if (isConfigured) {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+  db = getFirestore(app);
+} else {
+  // Safe dummy instances for unit tests / build time without secrets
+  try {
+    app = initializeApp({ apiKey: 'fake-api-key-for-test-mocking', projectId: 'fake-project' });
+    auth = getAuth(app);
+    googleProvider = new GoogleAuthProvider();
+    db = getFirestore(app);
+  } catch {
+    // ignore
+  }
+}
+
+export { auth, googleProvider, db };
 export default app;

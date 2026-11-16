@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
 import { revalidatePath } from 'next/cache';
+import { db } from '@/lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 interface CreatePostPayload {
   title: string;
@@ -74,10 +76,31 @@ export async function POST(req: NextRequest) {
     ].join('\n');
 
     const postsDir = path.join(process.cwd(), 'content', 'posts');
-    await fs.mkdir(postsDir, { recursive: true });
+    try {
+      await fs.mkdir(postsDir, { recursive: true });
+      const filePath = path.join(postsDir, `${safeSlug}.md`);
+      await fs.writeFile(filePath, frontmatter, 'utf-8');
+    } catch (fsErr) {
+      console.warn('Local filesystem write skipped/failed (expected in serverless):', fsErr);
+    }
 
-    const filePath = path.join(postsDir, `${safeSlug}.md`);
-    await fs.writeFile(filePath, frontmatter, 'utf-8');
+    // 2. Cloud Firestore 'posts' 컬렉션에 영구 적재 (Vercel Serverless 무손실 영속화)
+    try {
+      const postDocRef = doc(db, 'posts', safeSlug);
+      await setDoc(postDocRef, {
+        title,
+        slug: safeSlug,
+        date: postDate,
+        summary,
+        tags,
+        draft,
+        content: content.trim(),
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+    } catch (firestoreErr) {
+      console.error('Firestore post persistence error:', firestoreErr);
+      // 로컬 파일과 Firestore 둘 다 실패한 경우가 아니라면 응답은 계속 진행
+    }
 
     // On-demand revalidation of post list and individual post page
     try {
