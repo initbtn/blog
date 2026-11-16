@@ -371,17 +371,17 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
   const subTopicCount = subTopicCode ? allQuestions.filter((q) => q.subtopic_id === subTopicCode).length : 0;
 
   return (
-    <section className="glass-panel rounded-2xl p-4 sm:p-6 space-y-4 border border-sky-500/30 relative overflow-hidden shadow-2xl">
+    <section className="glass-panel rounded-2xl p-4 sm:p-6 space-y-4 border border-slate-200 dark:border-slate-800 relative overflow-hidden shadow-2xl">
       {/* Top Header Card */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
         {/* Left: Module Code, Subtopic & Question Counter */}
         <div className="flex items-center gap-2 min-w-0">
-          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30 shrink-0">
+          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-sky-500/10 text-sky-600 dark:text-sky-300 border border-sky-500/20 shrink-0">
             {subTopicCode ? `${moduleCode} · ${subTopicCode}` : moduleCode}
           </span>
 
           {activeQuestions.length > 0 && (
-            <div className="flex items-center font-mono text-xs text-slate-300 shrink-0">
+            <div className="flex items-center font-mono text-xs text-slate-700 dark:text-slate-300 shrink-0">
               {isJumpInputOpen ? (
                 <div className="flex items-center gap-1">
                   <input
@@ -393,17 +393,17 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                     onChange={(e) => setJumpInputValue(e.target.value)}
                     onBlur={handleCommitJump}
                     onKeyDown={handleJumpKeyDown}
-                    className="w-12 px-1 py-0.5 text-center text-xs font-mono font-bold bg-slate-950 text-sky-400 border border-sky-500 rounded outline-none shadow-sm"
+                    className="w-12 px-1 py-0.5 text-center text-xs font-mono font-bold bg-white dark:bg-slate-950 text-sky-600 dark:text-sky-400 border border-sky-500 rounded outline-none shadow-sm"
                   />
-                  <span className="text-slate-500">/ {activeQuestions.length}</span>
+                  <span className="text-slate-400 dark:text-slate-500">/ {activeQuestions.length}</span>
                 </div>
               ) : (
                 <button
                   onClick={handleOpenJumpInput}
                   title="클릭하여 문항 번호 직접 입력"
-                  className="px-1.5 py-0.5 rounded bg-slate-800/80 hover:bg-slate-700/80 text-sky-300 font-bold hover:text-white transition-colors cursor-pointer border border-slate-700/60"
+                  className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-sky-600 dark:text-sky-300 font-bold hover:text-sky-700 dark:hover:text-white transition-colors cursor-pointer border border-slate-200 dark:border-slate-700/60"
                 >
-                  {currentIndex + 1} <span className="text-slate-400 font-normal">/ {activeQuestions.length}</span>
+                  {currentIndex + 1} <span className="text-slate-500 dark:text-slate-400 font-normal">/ {activeQuestions.length}</span>
                 </button>
               )}
             </div>
@@ -413,7 +413,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
         {/* Right: Minimal Compact Icon Toolbar */}
         <div className="flex items-center gap-1 shrink-0">
           {/* Filter Mode Tabs */}
-          <div className="flex items-center p-0.5 rounded-lg bg-slate-900/90 border border-slate-800/90">
+          <div className="flex items-center p-0.5 rounded-lg bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800/90">
             {subTopicCode && (
               <button
                 onClick={() => setFilterMode('subtopic')}
@@ -421,7 +421,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                 className={`p-1.5 rounded-md transition-colors ${
                   filterMode === 'subtopic'
                     ? 'bg-sky-600 text-white shadow-sm font-mono text-[11px] font-bold px-2'
-                    : 'text-slate-400 hover:text-slate-200 text-[11px] font-mono px-2'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 text-[11px] font-mono px-2'
                 }`}
               >
                 {subTopicCode}
@@ -433,7 +433,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
               className={`p-1.5 rounded-md transition-colors ${
                 filterMode === 'all'
                   ? 'bg-sky-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -443,8 +443,8 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
               title={`스크랩 복습 (${scrappedCountInModule})`}
               className={`p-1.5 rounded-md transition-colors relative ${
                 filterMode === 'scrapped'
-                  ? 'bg-amber-500 text-black shadow-sm'
-                  : 'text-slate-400 hover:text-amber-400'
+                  ? 'bg-amber-500 text-slate-950 shadow-sm'
+                  : 'text-slate-600 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400'
               }`}
             >
               <Star className="w-3.5 h-3.5" />
@@ -460,12 +460,12 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
             title={globalHintEnabled ? '힌트 끄기' : '힌트 켜기'}
             className={`p-1.5 rounded-lg border transition-all ${
               globalHintEnabled
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <Lightbulb
-              className={`w-3.5 h-3.5 ${globalHintEnabled ? 'text-amber-400 fill-amber-400/20' : ''}`}
+              className={`w-3.5 h-3.5 ${globalHintEnabled ? 'text-amber-500 dark:text-amber-400 fill-amber-500/20' : ''}`}
             />
           </button>
 
@@ -474,7 +474,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
             <button
               onClick={handleResetCurrentAnswer}
               title="현재 문항 다시 풀기 (답안 초기화)"
-              className="p-1.5 rounded-lg border bg-slate-900/80 text-slate-400 border-slate-800 hover:text-sky-300 hover:border-sky-500/40 transition-all flex items-center gap-1 text-[11px] font-mono"
+              className="p-1.5 rounded-lg border bg-slate-100 hover:bg-slate-200 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-sky-600 dark:hover:text-sky-300 hover:border-sky-500/40 transition-all flex items-center gap-1 text-[11px] font-mono"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">다시풀기</span>
@@ -492,8 +492,8 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
             disabled={currentIndex === 0}
             className={`p-1 rounded-md transition-all shrink-0 ${
               currentIndex === 0
-                ? 'text-slate-600 cursor-not-allowed opacity-40'
-                : 'text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 shadow-sm active:scale-95'
+                ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-40'
+                : 'text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700/60 shadow-sm active:scale-95'
             }`}
             title="이전 문항"
           >
@@ -501,7 +501,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
           </button>
 
           {/* Progress Bar */}
-          <div className="flex-1 w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
+          <div className="flex-1 w-full bg-slate-100 dark:bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
             <div
               className="bg-gradient-to-r from-sky-500 to-indigo-500 h-full transition-all duration-300 ease-out"
               style={{
@@ -516,8 +516,8 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
             disabled={currentIndex === activeQuestions.length - 1}
             className={`p-1 rounded-md transition-all shrink-0 ${
               currentIndex === activeQuestions.length - 1
-                ? 'text-slate-600 cursor-not-allowed opacity-40'
-                : 'text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 shadow-sm active:scale-95'
+                ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-40'
+                : 'text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700/60 shadow-sm active:scale-95'
             }`}
             title="다음 문항"
           >
@@ -529,11 +529,11 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
       {/* Card Content with Touch Swipe Gesture */}
       {activeQuestions.length === 0 ? (
         <div className="py-12 text-center space-y-3">
-          <Star className="w-10 h-10 text-slate-600 mx-auto" />
-          <p className="text-slate-400 text-sm">해당 조건의 기출문항이 없습니다.</p>
+          <Star className="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto" />
+          <p className="text-slate-600 dark:text-slate-400 text-sm">해당 조건의 기출문항이 없습니다.</p>
           <button
             onClick={() => setFilterMode('all')}
-            className="px-3 py-1.5 rounded-lg text-xs font-mono bg-sky-600/80 hover:bg-sky-600 text-white transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-mono bg-sky-600 hover:bg-sky-500 text-white transition-colors"
           >
             모듈 전체 문항 보기
           </button>
@@ -547,9 +547,9 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
             className="space-y-4 touch-pan-y"
           >
             {/* Exam Metadata Info Bar & Scrap Button */}
-            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 border-b border-slate-800/60 pb-2">
+            <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800/60 pb-2">
               <div className="flex items-center gap-2 truncate">
-                <span className="px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-300">
+                <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60">
                   {currentQ.source || '공식기출'}
                 </span>
                 {currentQ.exam_title && <span className="truncate">{currentQ.exam_title}</span>}
@@ -558,7 +558,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                 onClick={() => toggleScrap(currentQ.id)}
                 title={isScrapped ? '스크랩 해제' : '오답노트 스크랩'}
                 className={`p-1 rounded transition-colors ${
-                  isScrapped ? 'text-amber-400' : 'text-slate-500 hover:text-amber-300'
+                  isScrapped ? 'text-amber-500 dark:text-amber-400' : 'text-slate-400 hover:text-amber-500 dark:hover:text-amber-300'
                 }`}
               >
                 <Star className={`w-4 h-4 ${isScrapped ? 'fill-amber-400' : ''}`} />
@@ -577,12 +577,12 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
               }`}
             >
               <div className="flex items-start gap-2.5">
-                <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <Lightbulb className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <div className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider">
+                  <div className="text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                     핵심 개념 힌트
                   </div>
-                  <p className="text-xs text-amber-200/90 leading-relaxed font-sans">
+                  <p className="text-xs text-amber-900/90 dark:text-amber-200/90 leading-relaxed font-sans">
                     {getQuestionHint(currentQ)}
                   </p>
                 </div>
@@ -596,20 +596,20 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                 const isAnswer = choice.number === currentQ.answer;
 
                 let btnStyle =
-                  'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-800/40 text-slate-200';
-                let badgeStyle = 'bg-slate-800 text-slate-400';
+                  'bg-slate-50/80 hover:bg-slate-100 dark:bg-slate-900/60 dark:hover:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-800 dark:text-slate-200';
+                let badgeStyle = 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400';
 
                 if (isAnswered) {
                   if (isAnswer) {
                     btnStyle =
-                      'bg-emerald-950/40 border-emerald-500/80 text-emerald-200 font-medium shadow-sm';
-                    badgeStyle = 'bg-emerald-500 text-black font-bold';
+                      'bg-emerald-500/10 dark:bg-emerald-950/40 border-emerald-500/80 text-emerald-800 dark:text-emerald-200 font-medium shadow-sm';
+                    badgeStyle = 'bg-emerald-500 text-white dark:text-black font-bold';
                   } else if (isSelected && !isCorrect) {
                     btnStyle =
-                      'bg-rose-950/40 border-rose-500/80 text-rose-200 font-medium shadow-sm';
+                      'bg-rose-500/10 dark:bg-rose-950/40 border-rose-500/80 text-rose-800 dark:text-rose-200 font-medium shadow-sm';
                     badgeStyle = 'bg-rose-500 text-white font-bold';
                   } else {
-                    btnStyle = 'opacity-50 border-slate-800 text-slate-400';
+                    btnStyle = 'opacity-40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500';
                   }
                 }
 
@@ -637,23 +637,23 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
             <div
               className={`rounded-xl p-3 sm:p-4 border transition-all space-y-2 animate-in fade-in-50 duration-200 ${
                 isCorrect
-                  ? 'bg-emerald-950/20 border-emerald-500/40'
-                  : 'bg-rose-950/20 border-rose-500/40'
+                  ? 'bg-emerald-500/10 dark:bg-emerald-950/20 border-emerald-500/40'
+                  : 'bg-rose-500/10 dark:bg-rose-950/20 border-rose-500/40'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {isCorrect ? (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span className="font-bold text-emerald-400 text-xs sm:text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm">
                         정답 (정답: {currentQ.answer}번)
                       </span>
                     </>
                   ) : (
                     <>
-                      <AlertCircle className="w-4 h-4 text-rose-400" />
-                      <span className="font-bold text-rose-400 text-xs sm:text-sm">
+                      <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                      <span className="font-bold text-rose-700 dark:text-rose-400 text-xs sm:text-sm">
                         오답 (정답: {currentQ.answer}번)
                       </span>
                     </>
@@ -661,7 +661,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
                 </div>
                 <button
                   onClick={() => setShowExplanation((prev) => !prev)}
-                  className="text-xs text-sky-400 hover:text-sky-300 underline font-mono flex items-center gap-1"
+                  className="text-xs text-sky-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1 cursor-pointer"
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
                   {showExplanation ? '해설 닫기' : '해설 보기'}
@@ -669,7 +669,7 @@ export function TopicQuizCardDeck({ moduleCode, subTopicCode, moduleTitle }: Top
               </div>
 
               {showExplanation && (
-                <div className="pt-2 text-xs text-slate-300 leading-relaxed border-t border-slate-800 whitespace-pre-line font-sans">
+                <div className="pt-2 text-xs text-slate-700 dark:text-slate-300 leading-relaxed border-t border-slate-200 dark:border-slate-800 whitespace-pre-line font-sans">
                   {currentQ.explain || `정답은 ${currentQ.answer}번입니다.`}
                 </div>
               )}
