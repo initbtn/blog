@@ -80,11 +80,11 @@ export function HeaderActions() {
           setIsSubscribeOpen(!isSubscribeOpen);
           setSubscribeResult(null);
         }}
-        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-all text-xs font-semibold"
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/10 border border-amber-500/40 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 dark:hover:bg-amber-500/20 transition-all text-xs font-semibold"
         title="새 아티클 이메일 구독"
         aria-label="블로그 구독하기"
       >
-        <Bell className="w-3.5 h-3.5 text-amber-400" />
+        <Bell className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
         <span className="hidden sm:inline">구독하기</span>
       </button>
 
