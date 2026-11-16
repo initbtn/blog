@@ -1,12 +1,12 @@
-import { getAllPostsAsync, getAllTagsAsync } from '../lib/posts';
+import { getAllPosts, getAllTags } from '../lib/posts';
 import { PostCard } from '../components/PostCard';
 import { ArticleExplorer } from '../components/ArticleExplorer';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default async function HomePage() {
-  const posts = await getAllPostsAsync();
-  const tags = await getAllTagsAsync();
+export default function HomePage() {
+  const posts = getAllPosts();
+  const tags = getAllTags();
   const featuredPost = posts[0];
   const regularPosts = posts.slice(1);
 
