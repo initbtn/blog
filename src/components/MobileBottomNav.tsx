@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, User, FileText } from 'lucide-react';
+import { BookOpen, User, FileText, GraduationCap } from 'lucide-react';
 import { GithubIcon } from './icons/GithubIcon';
+import { useAuth } from '@/hooks/useAuth';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { isAdmin } = useAuth();
 
   const navItems = [
     {
@@ -23,6 +25,17 @@ export function MobileBottomNav() {
       isActive: pathname === '/about',
       isExternal: false,
     },
+    ...(isAdmin
+      ? [
+          {
+            name: '학습실',
+            href: '/admin/quiz',
+            icon: GraduationCap,
+            isActive: pathname.startsWith('/admin/quiz'),
+            isExternal: false,
+          },
+        ]
+      : []),
     {
       name: '이력서',
       href: 'https://initbtn.github.io/resume-vuejs/',

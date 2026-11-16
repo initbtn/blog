@@ -1,11 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Check, Share2, Copy, CheckCheck, Loader2, X, Bell } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Mail, Check, Share2, Copy, CheckCheck, Loader2, X, Bell, LogIn, LogOut, GraduationCap, ShieldCheck } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { useAuth } from '@/hooks/useAuth';
 
 export function HeaderActions() {
+  const { user, loading, isAdmin, loginWithGoogle, logout } = useAuth();
   const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscribeResult, setSubscribeResult] = useState<{ success: boolean; msg: string } | null>(null);
@@ -52,35 +57,36 @@ export function HeaderActions() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim() }),
       });
       const data = await res.json();
 
-      if (res.ok && data.success) {
-        setSubscribeResult({ success: true, msg: data.message });
+      if (res.ok) {
+        setSubscribeResult({ success: true, msg: '구독 신청이 완료되었습니다. 환영합니다!' });
         setEmail('');
       } else {
-        setSubscribeResult({ success: false, msg: data.error || '구독 신청에 실패했습니다.' });
+        setSubscribeResult({ success: false, msg: data.error || '구독 신청 중 오류가 발생했습니다.' });
       }
-    } catch (err: any) {
-      setSubscribeResult({ success: false, msg: '네트워크 연결 상태를 확인해주세요.' });
+    } catch {
+      setSubscribeResult({ success: false, msg: '네트워크 연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="relative flex items-center gap-1.5 sm:gap-2">
-      {/* ── 0. 테마 토글 (기존 아이콘셋 Sun/Moon) ── */}
+    <div className="relative flex items-center gap-1 sm:gap-1.5">
+      {/* ── 0. 테마 토글 (Dark / Light) ── */}
       <ThemeToggle />
 
-      {/* ── 1. 구독하기 버튼 ── */}
+      {/* ── 1. 구독하기 버튼 (벨 아이콘) ── */}
       <button
         onClick={() => {
           setIsSubscribeOpen(!isSubscribeOpen);
+          setIsProfileOpen(false);
           setSubscribeResult(null);
         }}
-        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/10 border border-amber-500/40 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 dark:hover:bg-amber-500/20 transition-all text-xs font-semibold"
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/10 border border-amber-500/40 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 dark:hover:bg-amber-500/20 transition-all text-xs font-semibold cursor-pointer"
         title="새 아티클 이메일 구독"
         aria-label="블로그 구독하기"
       >
@@ -91,7 +97,7 @@ export function HeaderActions() {
       {/* ── 2. 공유하기 버튼 ── */}
       <button
         onClick={handleShare}
-        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:border-sky-500/60 hover:text-sky-600 dark:hover:text-sky-300 transition-colors text-xs font-medium"
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:border-sky-500/60 hover:text-sky-600 dark:hover:text-sky-300 transition-colors text-xs font-medium cursor-pointer"
         title="현재 페이지 공유/링크 복사"
         aria-label="공유하기"
       >
@@ -108,6 +114,91 @@ export function HeaderActions() {
         )}
       </button>
 
+      {/* ── 3. Google Auth 로그인 / 프로필 액션 ── */}
+      {loading ? (
+        <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 flex items-center justify-center animate-pulse">
+          <Loader2 className="w-3 h-3 text-slate-400 animate-spin" />
+        </div>
+      ) : user ? (
+        <div className="relative">
+          <button
+            onClick={() => {
+              setIsProfileOpen(!isProfileOpen);
+              setIsSubscribeOpen(false);
+            }}
+            className="flex items-center gap-1 p-0.5 rounded-full border border-sky-500/50 hover:border-sky-400 focus:outline-none transition-transform hover:scale-105 cursor-pointer"
+            aria-label="사용자 프로필 메뉴"
+            title={user.email || '프로필'}
+          >
+            {user.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt="관리자 프로필"
+                className="w-6 h-6 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 text-xs font-bold flex items-center justify-center">
+                {user.displayName?.[0] || 'U'}
+              </div>
+            )}
+          </button>
+
+          {/* 프로필 팝오버 드롭다운 */}
+          {isProfileOpen && (
+            <div className="absolute right-0 top-10 z-50 w-56 p-3 rounded-2xl glass-panel border border-sky-500/30 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 space-y-2.5">
+              <div className="px-1 py-0.5 border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                    {user.displayName || '사용자'}
+                  </span>
+                  {isAdmin && (
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      <ShieldCheck className="w-2.5 h-2.5" />
+                      ADMIN
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate">
+                  {user.email}
+                </p>
+              </div>
+
+              {isAdmin && (
+                <Link
+                  href="/admin/quiz"
+                  onClick={() => setIsProfileOpen(false)}
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-600 dark:text-sky-300 text-xs font-semibold transition-colors"
+                >
+                  <GraduationCap className="w-4 h-4 text-sky-500 dark:text-sky-400" />
+                  <span>기출 학습실 바로가기</span>
+                </Link>
+              )}
+
+              <button
+                onClick={() => {
+                  logout();
+                  setIsProfileOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                <span>로그아웃</span>
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={loginWithGoogle}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 hover:border-sky-500/60 hover:text-sky-600 dark:hover:text-sky-300 transition-colors text-xs font-medium cursor-pointer"
+          title="Google 로그인"
+          aria-label="Google 로그인"
+        >
+          <LogIn className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400" />
+          <span className="hidden sm:inline">로그인</span>
+        </button>
+      )}
+
       {/* ── 구독 팝업 모달 (Popover) ── */}
       {isSubscribeOpen && (
         <div className="absolute right-0 top-12 z-50 w-80 sm:w-88 p-4 rounded-2xl glass-panel border border-amber-500/40 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
@@ -118,7 +209,7 @@ export function HeaderActions() {
             </div>
             <button
               onClick={() => setIsSubscribeOpen(false)}
-              className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               aria-label="닫기"
             >
               <X className="w-3.5 h-3.5" />
@@ -143,7 +234,7 @@ export function HeaderActions() {
               <button
                 type="submit"
                 disabled={isSubmitting || !email.trim()}
-                className="px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold disabled:opacity-40 transition-colors flex items-center gap-1 shrink-0"
+                className="px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold disabled:opacity-40 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
