@@ -129,37 +129,7 @@ export async function getAllPostsAsync(): Promise<PostMeta[]> {
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  // 1. Cloud Firestore 'posts' 컬렉션 우선 조회 (API 원격 수정/발행 글 우선권)
-  if (db && typeof db.app === 'object') {
-    try {
-      const postDocRef = doc(db, 'posts', slug);
-      const postSnap = await getDoc(postDocRef);
-      if (postSnap.exists()) {
-        const data = postSnap.data();
-        if (data.draft === true && process.env.NODE_ENV === 'production') {
-          return null;
-        }
-        const content = data.content || '';
-        const htmlContent = await marked.parse(content);
-
-        return {
-          title: data.title || slug,
-          slug,
-          date: data.date ? String(data.date).slice(0, 10) : new Date().toISOString().slice(0, 10),
-          summary: data.summary || '',
-          tags: Array.isArray(data.tags) ? data.tags : [],
-          readingTime: calculateReadingTime(content),
-          draft: Boolean(data.draft),
-          content,
-          htmlContent,
-        };
-      }
-    } catch (firestoreErr) {
-      console.warn(`Firestore getPostBySlug lookup failed for ${slug}, falling back to local:`, firestoreErr);
-    }
-  }
-
-  // 2. 로컬 마크다운 파일 Fallback 조회 (SSG 정적 빌드 및 오프라인 보장)
+  // 1. 로컬 마크다운 파일 우선 조회 (SSG 정적 빌드 최적화)
   if (fs.existsSync(POSTS_DIRECTORY)) {
     const fileNames = fs.readdirSync(POSTS_DIRECTORY);
     let matchedFileName: string | null = null;
@@ -204,22 +174,34 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     }
   }
 
-  return null;
-}
+  // 2. 로컬 파일에 없는 경우 Cloud Firestore 'posts' 컬렉션 조회 (API 원격 발행 글 영속화 지원)
+  if (db && typeof db.app === 'object') {
+    try {
+      const postDocRef = doc(db, 'posts', slug);
+      const postSnap = await getDoc(postDocRef);
+      if (postSnap.exists()) {
+        const data = postSnap.data();
+        const content = data.content || '';
+        const htmlContent = await marked.parse(content);
 
-export async function getAllTagsAsync(): Promise<{ tag: string; count: number }[]> {
-  const posts = await getAllPostsAsync();
-  const tagCountMap: Record<string, number> = {};
-
-  for (const post of posts) {
-    for (const tag of post.tags) {
-      tagCountMap[tag] = (tagCountMap[tag] || 0) + 1;
+        return {
+          title: data.title || slug,
+          slug,
+          date: data.date ? String(data.date).slice(0, 10) : new Date().toISOString().slice(0, 10),
+          summary: data.summary || '',
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          readingTime: calculateReadingTime(content),
+          draft: Boolean(data.draft),
+          content,
+          htmlContent,
+        };
+      }
+    } catch (firestoreErr) {
+      console.warn(`Firestore getPostBySlug lookup failed for ${slug}:`, firestoreErr);
     }
   }
 
-  return Object.entries(tagCountMap)
-    .map(([tag, count]) => ({ tag, count }))
-    .sort((a, b) => b.count - a.count);
+  return null;
 }
 
 export function getAllTags(): { tag: string; count: number }[] {

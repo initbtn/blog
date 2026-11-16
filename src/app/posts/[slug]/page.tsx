@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getAllPostsAsync, getPostBySlug } from '../../../lib/posts';
+import { getAllPosts, getPostBySlug } from '../../../lib/posts';
 import { MermaidRenderer } from '../../../components/MermaidRenderer';
 import { TopicQuizCardDeck } from '../../../components/TopicQuizCardDeck';
 import { RelatedPosts } from '../../../components/RelatedPosts';
@@ -12,7 +12,7 @@ interface PostPageProps {
 }
 
 export async function generateStaticParams() {
-  const posts = await getAllPostsAsync();
+  const posts = getAllPosts();
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -178,7 +178,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <RelatedPosts
         currentSlug={slug}
         currentTags={post.tags || []}
-        allPosts={await getAllPostsAsync()}
+        allPosts={getAllPosts()}
       />
 
       {/* Post Footer */}
