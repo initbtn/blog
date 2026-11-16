@@ -36,10 +36,10 @@ draft: false
 
 ```mermaid
 flowchart LR
-    RawText["비정형 텍스트 문서<br/>(예: 'Snowflake Arctic 임베딩')"] --> Tokenizer["BPE 토크나이저<br/>(서브워드 분할 & ID 매핑)"]
-    Tokenizer --> Transformer["Transformer 인코더<br/>(Self-Attention & Contextualization)"]
-    Transformer --> Pooling["Mean Pooling 레이어<br/>(토큰 벡터 집약 & 정규화)"]
-    Pooling --> DenseVector["768차원 밀집 벡터<br/>[0.0241, -0.1082, ..., 0.0891]"]
+    RawText["텍스트 문서"] --> Tokenizer["토크나이저"]
+    Tokenizer --> Transformer["Transformer 인코더"]
+    Transformer --> Pooling["Mean Pooling"]
+    Pooling --> DenseVector["768차원 벡터"]
 ```
 </div>
 
@@ -178,21 +178,8 @@ def chunk_text(
 
 ```mermaid
 flowchart TD
-    subgraph Layer2 ["Layer 2: 고속 장거리 점프 (스킵 리스트 최상위)"]
-        L2_A["노드 A"] --> L2_B["노드 D"]
-    end
-    subgraph Layer1 ["Layer 1: 중거리 라우팅"]
-        L1_A["노드 A"] --> L1_B["노드 B"]
-        L1_B --> L1_C["노드 C"]
-        L1_C --> L1_D["노드 D"]
-    end
-    subgraph Layer0 ["Layer 0: 전수 조밀 그래프 (최하위 밀집 데이터)"]
-        L0_1["벡터 1"] --- L0_2["벡터 2"]
-        L0_2 --- L0_3["벡터 3"]
-        L0_3 --- L0_4["벡터 4 (목표 최근접)"]
-    end
-    L2_B -.-> L1_D
-    L1_D -.-> L0_4
+    L2["Layer 2 (최상위): 장거리 고속 점프"] -->|스킵 탐색| L1["Layer 1 (중간층): 중거리 라우팅"]
+    L1 -->|정밀 탐색| L0["Layer 0 (최하위): 최근접 이웃(ANN) 도달"]
 ```
 </div>
 
