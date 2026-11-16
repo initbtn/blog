@@ -89,10 +89,10 @@ flowchart TD
         StructuredParser["Structured Output Parser\n(Pydantic 스키마 검증 & JSON 역직렬화)"]
         
         VectorSearch -->|Relevant Chunks| PromptBuilder
-        PromptBuilder -->|LCEL 파이프 연산자 '|' | GCPGateway
+        PromptBuilder -->|LCEL 파이프 연산자| GCPGateway
         GCPGateway -->|추론 요청| ColabGPU
         ColabGPU -->|원시 텍스트 스트림| GCPGateway
-        GCPGateway -->|LCEL 파이프 연산자 '|' | StructuredParser
+        GCPGateway -->|LCEL 파이프 연산자| StructuredParser
     end
 
     %% 6. 최종 서빙
