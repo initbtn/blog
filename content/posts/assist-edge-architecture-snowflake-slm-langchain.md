@@ -46,60 +46,35 @@ draft: false
 
 ```mermaid
 flowchart TD
-    %% 1. 데이터 수집 단계
-    subgraph S1 ["1. 데이터 수집 (External Collectors)"]
-        RawSources["외부 원천 데이터\n(arXiv 논문 / HF 트렌드 / GitHub / CVE 공시)"]
-        Dedup["중복 검사 & 정규화\n(SHA-256 해시 대조 & Pydantic 파싱)"]
-        RawSources --> Dedup
+    %% 1. 인터페이스 계층
+    subgraph Tier1 ["Interface Layer (접점)"]
+        Web["Web Client (domlog)"]
+        Telegram["Telegram Bot"]
     end
 
-    %% 2. 엣지 벡터 인덱싱
-    subgraph S2 ["2. 지식 색인 (Snowflake Arctic Embed & Supabase)"]
-        Chunker["Contextual Chunking\n(상위 문서 맥락 1줄 주입)"]
-        Arctic["Snowflake Arctic Embed v2\n(미국 엔터프라이즈 임베딩 모델 / 768차원)"]
-        PGVector[("Supabase PGVector\n(HNSW 코사인 유사도 인덱스)")]
-        
-        Dedup --> Chunker
-        Chunker -->|텍스트 청크| Arctic
-        Arctic -->|768차원 밀집 벡터| PGVector
+    %% 2. 오케스트레이션 & 게이트웨이 계층
+    subgraph Tier2 ["Orchestration & Gateway Layer (배관)"]
+        LCEL["LangChain LCEL Pipeline"]
+        Gateway["GCP VM Gateway (FastAPI)"]
     end
 
-    %% 3. 질문 인입 및 RAG 검색
-    subgraph S3 ["3. RAG 지식 검색 (Retrieval Pipeline)"]
-        UserQuery["사용자 질문 / 소스코드 분석 요청"]
-        QueryEmbed["Snowflake Arctic Embed\n(질문 문장 벡터화)"]
-        VectorSearch["Top-K 코사인 유사도 검색\n(가장 연관된 상위 3~5개 지식 추출)"]
-        
-        UserQuery --> QueryEmbed
-        QueryEmbed --> VectorSearch
-        PGVector -.->|유사 벡터 검색| VectorSearch
+    %% 3. 지능 엔진 계층
+    subgraph Tier3 ["Intelligence Engine (사서 & 두뇌)"]
+        Snowflake["Snowflake Arctic Embed (사서)"]
+        SLM["sLM: Gemma 3 / Hermes 3 (두뇌)"]
     end
 
-    %% 4. LangChain LCEL 조립 (블랙박스 제어 배관)
-    subgraph S4 ["4. LangChain LCEL 오케스트레이션 (투명한 배관)"]
-        direction TB
-        PromptBuilder["PromptTemplate\n[시스템 규칙 + 질문 + RAG 검색 문서 결합]"]
-        
-        subgraph EdgeInfra ["5. 엣지 서빙 & 온디맨드 sLM 추론"]
-            GCPGateway["GCP VM Edge Gateway (FastAPI)\n- 인증 & 세션 관리 (JWT)\n- Scale-to-Zero 유휴 감시 데몬"]
-            ColabGPU["온디맨드 Colab T4/A100 GPU (Ollama)\n- 비중국권 sLM: Gemma 3 (12B) / Hermes 3 (8B)\n- JIT Auto-Wakeup 자율 터널"]
-            GCPGateway <==>|Reverse Tunnel / WireGuard| ColabGPU
-        end
-        
-        StructuredParser["Structured Output Parser\n(Pydantic 스키마 검증 & JSON 역직렬화)"]
-        
-        VectorSearch -->|Relevant Chunks| PromptBuilder
-        PromptBuilder -->|LCEL 파이프 연산자| GCPGateway
-        GCPGateway -->|추론 요청| ColabGPU
-        ColabGPU -->|원시 텍스트 스트림| GCPGateway
-        GCPGateway -->|LCEL 파이프 연산자| StructuredParser
+    %% 4. 데이터 저장소 계층
+    subgraph Tier4 ["Data & Storage Layer (저장소)"]
+        PGVector[("Supabase PGVector (HNSW)")]
+        Firestore[("Cloud Firestore")]
     end
 
-    %% 6. 최종 서빙
-    subgraph S6 ["6. 최종 서빙 & 영속화"]
-        StructuredParser --> Client["Next.js domlog 포스팅 / Telegram 봇 알림 / API 응답"]
-        StructuredParser --> Firestore[("Cloud Firestore\n(비정형 NoSQL 아티클 영속화)")]
-    end
+    %% 계층 간 단일 상하 결합 흐름
+    Tier1 <==> Tier2
+    Tier2 <==> Tier3
+    Tier3 <--> PGVector
+    Tier2 --> Firestore
 ```
 
   </div>
