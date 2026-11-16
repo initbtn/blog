@@ -29,19 +29,19 @@ export function FormattedQuestion({ questionIndex, rawText }: FormattedQuestionP
     if (isCodeOrAlgorithm) {
       return (
         <div className="space-y-3">
-          <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
-            <span className="text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
+          <div className="text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
+            <span className="text-sky-600 dark:text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
             {stem}
           </div>
-          <div className="rounded-xl overflow-hidden bg-slate-950/90 border border-slate-800/90 shadow-inner">
-            <div className="text-[11px] font-mono font-semibold text-slate-400 flex items-center justify-between px-3.5 py-1.5 bg-slate-900/80 border-b border-slate-800/80">
+          <div className="rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950/90 border border-slate-200 dark:border-slate-800 shadow-inner">
+            <div className="text-[11px] font-mono font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between px-3.5 py-1.5 bg-slate-100 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
                 <span>&lt;코드 / 알고리즘 블록&gt;</span>
               </div>
-              <span className="text-[10px] text-slate-500 font-normal">Source Viewer</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Source Viewer</span>
             </div>
-            <pre className="p-3 sm:p-4 text-xs sm:text-[13px] font-mono text-slate-200 leading-relaxed overflow-x-auto whitespace-pre selection:bg-sky-500/30">
+            <pre className="p-3 sm:p-4 text-xs sm:text-[13px] font-mono text-slate-800 dark:text-slate-200 leading-relaxed overflow-x-auto whitespace-pre selection:bg-sky-500/30">
               <code>{body}</code>
             </pre>
           </div>
@@ -53,18 +53,18 @@ export function FormattedQuestion({ questionIndex, rawText }: FormattedQuestionP
       const parts = body.split(/\n\s*(?=\[[가나다라마바사A-Z]:)/);
       return (
         <div className="space-y-3">
-          <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
-            <span className="text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
+          <div className="text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
+            <span className="text-sky-600 dark:text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
             {stem}
           </div>
-          <div className="rounded-xl p-3.5 sm:p-4 bg-slate-900/90 border border-slate-800/90 shadow-inner space-y-3">
-            <div className="text-[11px] font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800/60 pb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+          <div className="rounded-xl p-3.5 sm:p-4 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-inner space-y-3">
+            <div className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200/80 dark:border-slate-800/60 pb-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400" />
               <span>&lt;보 기&gt;</span>
             </div>
-            <div className="space-y-3 text-xs sm:text-sm text-slate-200 leading-relaxed">
+            <div className="space-y-3 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
               {parts.map((p, idx) => (
-                <div key={idx} className={idx > 0 ? "pt-2.5 border-t border-slate-800/60" : ""}>
+                <div key={idx} className={idx > 0 ? "pt-2.5 border-t border-slate-200/80 dark:border-slate-800/60" : ""}>
                   <div className="whitespace-pre-line font-sans">{p.trim()}</div>
                 </div>
               ))}
@@ -77,16 +77,16 @@ export function FormattedQuestion({ questionIndex, rawText }: FormattedQuestionP
     // Standard multiline box (bullets, definitions, steps)
     return (
       <div className="space-y-3">
-        <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
-          <span className="text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
+        <div className="text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
+          <span className="text-sky-600 dark:text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
           {stem}
         </div>
-        <div className="rounded-xl p-3.5 sm:p-4 bg-slate-900/90 border border-slate-800/90 shadow-inner space-y-2">
-          <div className="text-[11px] font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800/60 pb-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+        <div className="rounded-xl p-3.5 sm:p-4 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-inner space-y-2">
+          <div className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200/80 dark:border-slate-800/60 pb-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400" />
             <span>&lt;보 기&gt;</span>
           </div>
-          <div className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans whitespace-pre-line">
+          <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-sans whitespace-pre-line">
             {body}
           </div>
         </div>
@@ -105,21 +105,21 @@ export function FormattedQuestion({ questionIndex, rawText }: FormattedQuestionP
 
     return (
       <div className="space-y-3">
-        <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
-          <span className="text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
+        <div className="text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
+          <span className="text-sky-600 dark:text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
           {stem}
         </div>
 
         {items.length > 0 && (
-          <div className="rounded-xl p-3.5 sm:p-4 bg-slate-900/90 border border-slate-800/90 shadow-inner space-y-2">
-            <div className="text-[11px] font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800/60 pb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+          <div className="rounded-xl p-3.5 sm:p-4 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-inner space-y-2">
+            <div className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200/80 dark:border-slate-800/60 pb-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400" />
               <span>&lt;보 기&gt;</span>
             </div>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-sans">
               {items.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="text-sky-400 font-bold shrink-0 mt-0.5">•</span>
+                  <span className="text-sky-600 dark:text-sky-400 font-bold shrink-0 mt-0.5">•</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -144,21 +144,21 @@ export function FormattedQuestion({ questionIndex, rawText }: FormattedQuestionP
 
     return (
       <div className="space-y-3">
-        <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
-          <span className="text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
+        <div className="text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base leading-relaxed">
+          <span className="text-sky-600 dark:text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
           {stem}
         </div>
 
         {items.length > 0 && (
-          <div className="rounded-xl p-3.5 sm:p-4 bg-slate-900/90 border border-slate-800/90 shadow-inner space-y-2">
-            <div className="text-[11px] font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800/60 pb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+          <div className="rounded-xl p-3.5 sm:p-4 bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-inner space-y-2">
+            <div className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200/80 dark:border-slate-800/60 pb-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400" />
               <span>&lt;보 기&gt;</span>
             </div>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-sans">
               {items.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="text-sky-400 font-bold shrink-0 font-mono">{item.label}</span>
+                  <span className="text-sky-600 dark:text-sky-400 font-bold shrink-0 font-mono">{item.label}</span>
                   <span>{item.text}</span>
                 </li>
               ))}
@@ -171,8 +171,8 @@ export function FormattedQuestion({ questionIndex, rawText }: FormattedQuestionP
 
   // 3. Default standard question stem
   return (
-    <div className="text-slate-100 font-medium text-sm sm:text-base leading-relaxed min-h-[3rem]">
-      <span className="text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
+    <div className="text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base leading-relaxed min-h-[3rem]">
+      <span className="text-sky-600 dark:text-sky-400 font-bold mr-1.5">Q{questionIndex}.</span>
       {rawText}
     </div>
   );
