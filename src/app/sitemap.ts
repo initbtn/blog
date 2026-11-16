@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { getAllPosts } from '../lib/posts';
+import { getAllPostsAsync } from '../lib/posts';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://domlog.vercel.app';
-  const posts = getAllPosts();
+  const posts = await getAllPostsAsync();
 
   const postUrls = posts.map((post) => ({
     url: `${baseUrl}/posts/${post.slug}`,
