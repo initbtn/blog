@@ -29,6 +29,7 @@ describe('Global Auth UI & Navigation Integration', () => {
       user: null,
       loading: false,
       isAdmin: false,
+      idToken: null,
       loginWithGoogle: vi.fn(),
       logout: vi.fn(),
     });
@@ -51,6 +52,7 @@ describe('Global Auth UI & Navigation Integration', () => {
       } as any,
       loading: false,
       isAdmin: true,
+      idToken: 'mock-admin-token',
       loginWithGoogle: vi.fn(),
       logout: vi.fn(),
     });
@@ -70,6 +72,7 @@ describe('Global Auth UI & Navigation Integration', () => {
       } as any,
       loading: false,
       isAdmin: true,
+      idToken: 'mock-admin-token',
       loginWithGoogle: vi.fn(),
       logout: vi.fn(),
     });

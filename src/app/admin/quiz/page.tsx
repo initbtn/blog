@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Database,
   Layers,
+  Filter,
 } from 'lucide-react';
 import { FormattedQuestion } from '@/components/FormattedQuestion';
 
@@ -55,6 +56,8 @@ export default function AdminQuizDashboard() {
   // Subject: 'swe' (소프트웨어공학) vs 'history' (한국사)
   const [selectedSubject, setSelectedSubject] = useState<'swe' | 'history'>('swe');
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [selectedSource, setSelectedSource] = useState<string>('all');
+  const [selectedModule, setSelectedModule] = useState<string>('all');
   const [dataLoading, setDataLoading] = useState(false);
   const [isForbidden, setIsForbidden] = useState(false);
 
@@ -113,6 +116,8 @@ export default function AdminQuizDashboard() {
         const data = await res.json();
         if (data.success && isMounted) {
           setQuestions(data.questions || []);
+          setSelectedSource('all');
+          setSelectedModule('all');
           setCurrentIndex(0);
           setSelectedChoice(null);
           setShowExplanation(false);
@@ -151,10 +156,51 @@ export default function AdminQuizDashboard() {
     loadHistory();
   }, [user, selectedSubject, questions.length]);
 
+  // 4. Sources and Modules taxonomy lists for filtering
+  const availableSources = useMemo(() => {
+    const set = new Set<string>();
+    questions.forEach((q) => {
+      if (q.source) set.add(q.source);
+    });
+    return Array.from(set).sort();
+  }, [questions]);
+
+  const availableModules = useMemo(() => {
+    const map = new Map<string, string>();
+    questions.forEach((q) => {
+      if (q.ncs_module) {
+        if (!map.has(q.ncs_module)) {
+          map.set(q.ncs_module, q.chapter || q.ncs_module);
+        }
+      }
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [questions]);
+
+  // 5. Filtered questions according to selected filters
+  const filteredQuestions = useMemo(() => {
+    return questions.filter((q) => {
+      if (selectedSource !== 'all' && q.source !== selectedSource) {
+        return false;
+      }
+      if (selectedModule !== 'all' && q.ncs_module !== selectedModule) {
+        return false;
+      }
+      return true;
+    });
+  }, [questions, selectedSource, selectedModule]);
+
+  // Reset index when filters change
+  useEffect(() => {
+    setCurrentIndex(0);
+    setSelectedChoice(null);
+    setShowExplanation(false);
+  }, [selectedSource, selectedModule]);
+
   // Sync choice selection with existing answer history
   useEffect(() => {
-    if (questions.length === 0) return;
-    const currentQ = questions[currentIndex];
+    if (filteredQuestions.length === 0) return;
+    const currentQ = filteredQuestions[currentIndex];
     if (currentQ && userAnswers[currentQ.id]) {
       setSelectedChoice(userAnswers[currentQ.id].choice);
       setShowExplanation(true);
@@ -162,7 +208,7 @@ export default function AdminQuizDashboard() {
       setSelectedChoice(null);
       setShowExplanation(false);
     }
-  }, [currentIndex, questions, userAnswers]);
+  }, [currentIndex, filteredQuestions, userAnswers]);
 
   // Save answer to Firestore
   const saveAnswerToFirestore = async (qId: string, choiceNum: number, isCorrect: boolean) => {
@@ -253,7 +299,7 @@ export default function AdminQuizDashboard() {
     );
   }
 
-  const currentQ = questions[currentIndex];
+  const currentQ = filteredQuestions[currentIndex];
   const isAnswered = selectedChoice !== null;
   const isCorrect = currentQ && selectedChoice === currentQ.answer;
 
@@ -308,14 +354,78 @@ export default function AdminQuizDashboard() {
         </div>
       </div>
 
+      {/* Filter Bar (기출고사/출처별 및 토픽/모듈별 필터) */}
+      <div className="glass-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 border border-slate-200 dark:border-slate-800 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+            <Filter className="w-3.5 h-3.5 text-sky-500" />
+            <span className="font-semibold">맞춤 필터</span>
+          </div>
+
+          {/* Source Filter */}
+          <div className="flex items-center gap-1.5">
+            <label htmlFor="source-filter" className="text-slate-500 dark:text-slate-400 text-[11px]">
+              출처:
+            </label>
+            <select
+              id="source-filter"
+              aria-label="기출고사별 필터"
+              value={selectedSource}
+              onChange={(e) => setSelectedSource(e.target.value)}
+              className="py-1 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none cursor-pointer"
+            >
+              <option value="all">전체 기출고사 ({questions.length}제)</option>
+              {availableSources.map((src) => {
+                const count = questions.filter((q) => q.source === src).length;
+                return (
+                  <option key={src} value={src}>
+                    {src} ({count}제)
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          {/* Module Filter */}
+          {availableModules.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <label htmlFor="module-filter" className="text-slate-500 dark:text-slate-400 text-[11px]">
+                토픽:
+              </label>
+              <select
+                id="module-filter"
+                aria-label="토픽별 필터"
+                value={selectedModule}
+                onChange={(e) => setSelectedModule(e.target.value)}
+                className="py-1 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none cursor-pointer"
+              >
+                <option value="all">전체 토픽 ({questions.length}제)</option>
+                {availableModules.map(([mod, title]) => {
+                  const count = questions.filter((q) => q.ncs_module === mod).length;
+                  return (
+                    <option key={mod} value={mod}>
+                      {mod}: {title} ({count}제)
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
+        </div>
+
+        <div className="text-slate-500 dark:text-slate-400 text-[11px]">
+          선택된 풀이 범위: <span className="font-bold text-sky-600 dark:text-sky-400">{filteredQuestions.length}</span>문항
+        </div>
+      </div>
+
       {/* Main Quiz Area */}
       {dataLoading ? (
         <div className="glass-panel rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
           비공개 문제 데이터 동기화 중...
         </div>
-      ) : questions.length === 0 ? (
+      ) : filteredQuestions.length === 0 ? (
         <div className="glass-panel rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
-          문제를 불러오지 못했습니다.
+          선택한 필터 조건에 해당하는 문제가 없습니다.
         </div>
       ) : (
         <div className="glass-panel rounded-2xl p-6 sm:p-8 space-y-6 border border-slate-200 dark:border-slate-800 shadow-2xl">
@@ -323,13 +433,13 @@ export default function AdminQuizDashboard() {
           <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 font-bold">
-                {currentQ.ncs_module || currentQ.era || '기출'}
+                {currentQ.source || currentQ.ncs_module || currentQ.era || '기출'}
               </span>
               <span>{currentQ.chapter || currentQ.topic}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-slate-800 dark:text-slate-200 font-bold">
-                {currentIndex + 1} / {questions.length}
+                {currentIndex + 1} / {filteredQuestions.length}
               </span>
               <div className="flex items-center gap-1">
                 <button
@@ -340,8 +450,8 @@ export default function AdminQuizDashboard() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
-                  disabled={currentIndex === questions.length - 1}
-                  onClick={() => setCurrentIndex((p) => Math.min(questions.length - 1, p + 1))}
+                  disabled={currentIndex === filteredQuestions.length - 1}
+                  onClick={() => setCurrentIndex((p) => Math.min(filteredQuestions.length - 1, p + 1))}
                   className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 disabled:opacity-30 cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />

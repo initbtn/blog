@@ -15,7 +15,7 @@ export function MobileBottomNav() {
       name: '아티클',
       href: '/',
       icon: BookOpen,
-      isActive: pathname === '/' || pathname.startsWith('/posts'),
+      isActive: pathname === '/' || (pathname ? pathname.startsWith('/posts') : false),
       isExternal: false,
     },
     {
@@ -31,7 +31,7 @@ export function MobileBottomNav() {
             name: '학습실',
             href: '/admin/quiz',
             icon: GraduationCap,
-            isActive: pathname.startsWith('/admin/quiz'),
+            isActive: Boolean(pathname?.startsWith('/admin/quiz')),
             isExternal: false,
           },
         ]
