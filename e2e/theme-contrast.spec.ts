@@ -47,6 +47,50 @@ test.describe('Light/Dark Dual Theme Visual & DOM Contrast Tests (@theme-dual)',
     expect(captionBg).not.toBe('rgb(2, 6, 23)'); // slate-950이 아님
   });
 
+  test('OS가 다크 모드일 때 사용자가 라이트 모드로 전환해도 H1, H2, 헤더 브랜드 텍스트가 흰색으로 고정되지 않고 어두운 색상이어야 한다 (@theme-os-toggle)', async ({ page }) => {
+    // OS 미디어 쿼리를 dark로 에뮬레이트
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto('/');
+
+    // 사이트 내 라이트 모드로 전환 버튼 클릭
+    const themeToggle = page.locator('button[aria-label*="라이트 모드로 전환"]');
+    await themeToggle.click();
+    await page.waitForTimeout(300);
+
+    // 1. Hero Card H1 명도 실측 (흰색 rgb 255 배제)
+    const heroH1 = page.locator('section.glass-panel h1').first();
+    const h1Color = await heroH1.evaluate((node) => window.getComputedStyle(node).color);
+    const h1Rgb = h1Color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (h1Rgb) {
+      const [_, r, g, b] = h1Rgb.map(Number);
+      expect(r).toBeLessThan(100);
+      expect(g).toBeLessThan(100);
+      expect(b).toBeLessThan(100);
+    }
+
+    // 2. 아티클 카드 H2 명도 실측
+    const articleH2 = page.locator('article h2').first();
+    const h2Color = await articleH2.evaluate((node) => window.getComputedStyle(node).color);
+    const h2Rgb = h2Color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (h2Rgb) {
+      const [_, r, g, b] = h2Rgb.map(Number);
+      expect(r).toBeLessThan(100);
+      expect(g).toBeLessThan(100);
+      expect(b).toBeLessThan(100);
+    }
+
+    // 3. 상단 헤더 브랜드 텍스트 명도 실측
+    const brand = page.locator('header a span').first();
+    const brandColor = await brand.evaluate((node) => window.getComputedStyle(node).color);
+    const brandRgb = brandColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (brandRgb) {
+      const [_, r, g, b] = brandRgb.map(Number);
+      expect(r).toBeLessThan(100);
+      expect(g).toBeLessThan(100);
+      expect(b).toBeLessThan(100);
+    }
+  });
+
   test('라이트 모드에서 아티클 상세 페이지 제목(h1) 및 빈도 뱃지, 연관 글 제목이 흰색으로 숨겨지지 않아야 한다', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('theme', 'light');

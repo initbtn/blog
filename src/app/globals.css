@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   /* 라이트 테마: 미니멀 클린 엔지니어링 룩 (Light Engineering Blueprint) */
