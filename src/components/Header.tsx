@@ -1,10 +1,15 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, User, FileText, Mail } from 'lucide-react';
+import { BookOpen, User, FileText, Mail, GraduationCap } from 'lucide-react';
 import { GithubIcon } from './icons/GithubIcon';
 import { HeaderActions } from './HeaderActions';
+import { useAuth } from '@/hooks/useAuth';
 
 export function Header() {
+  const { isAdmin } = useAuth();
+
   return (
     <header className="relative z-40 max-w-4xl mx-auto px-4 w-full pt-6">
       <div className="glass-panel rounded-2xl sm:rounded-full px-4 sm:px-6 h-14 flex items-center justify-between">
@@ -43,6 +48,15 @@ export function Header() {
             <User className="w-4 h-4 text-amber-500 dark:text-amber-400" />
             <span>소개</span>
           </Link>
+          {isAdmin && (
+            <Link 
+              href="/admin/quiz" 
+              className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 font-semibold transition-colors flex items-center gap-1.5 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/25"
+            >
+              <GraduationCap className="w-4 h-4" />
+              <span>학습실</span>
+            </Link>
+          )}
           <a 
             href="https://initbtn.github.io/resume-vuejs/" 
             target="_blank" 
@@ -78,7 +92,7 @@ export function Header() {
           </div>
         </nav>
 
-        {/* Header Right Actions: Subscribe & Share */}
+        {/* Header Right Actions: Subscribe & Share & Auth */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           <HeaderActions />
 
